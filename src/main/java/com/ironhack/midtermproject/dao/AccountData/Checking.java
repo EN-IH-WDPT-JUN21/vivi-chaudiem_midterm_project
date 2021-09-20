@@ -1,5 +1,6 @@
 package com.ironhack.midtermproject.dao.AccountData;
 
+import com.ironhack.midtermproject.enums.CheckingType;
 import com.ironhack.midtermproject.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +29,9 @@ public class Checking extends Account {
 
     @DateTimeFormat(pattern = "yyy-MM-dd")
     private LocalDate creationDate = LocalDate.now();
+
+    @Enumerated(EnumType.STRING)
+    private CheckingType checkingType = CheckingType.NORMAL_CHECKING;
 
     @Enumerated(EnumType.STRING)
     private Status status;

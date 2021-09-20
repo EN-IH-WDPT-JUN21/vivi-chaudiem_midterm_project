@@ -1,8 +1,11 @@
 package com.ironhack.midtermproject.service.impl;
 
+import com.ironhack.midtermproject.controller.dto.CheckingDTO;
 import com.ironhack.midtermproject.dao.AccountData.Account;
+import com.ironhack.midtermproject.dao.AccountData.Checking;
+import com.ironhack.midtermproject.enums.CheckingType;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
-import com.ironhack.midtermproject.repository.AccountDataRepositories.StudentCheckingRepository;
+import com.ironhack.midtermproject.service.interfaces.ICheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,26 +16,23 @@ import java.time.Period;
 import java.util.Optional;
 
 @Service
-public class CheckingService {
+public class CheckingService implements ICheckingService {
     @Autowired
     private CheckingRepository checkingRepository;
 
-    @Autowired
-    private StudentCheckingRepository studentCheckingRepository;
 
     // DTO instead
-    public <T extends Account> T store(T checking) {
-        Optional<Account> optionalChecking = checkingRepository.findById(checking.getId());
-        if(optionalChecking.isPresent()) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Checking account with id " + checking.getId() + "already exists.");
-
-        Optional<Account> optionalStudentChecking = studentCheckingRepository.findById(checking.getId());
-        if(optionalStudentChecking.isPresent()) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Student checking account with id " + checking.getId() + "already exists.");
+    public Checking store(CheckingDTO checkingDTO) {
+        Optional<Account> optionalChecking = checkingRepository.findById(checkingDTO.getId());
+        if(optionalChecking.isPresent()) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Checking account with id " + checkingDTO.getId() + "already exists.");
 
         // Create a student checking account if the account holder is younger than 24
-        int age = calculateAge(checking.getAccountHolder().getDateOfBirth(), LocalDate.now());
+        int age = calculateAge(checkingDTO.getAccountHolder().getDateOfBirth(), LocalDate.now());
         if(age < 24) {
-            return studentCheckingRepository.save(checking);
+            Checking studentChecking = new Checking(checkingDTO.getId(), checkingDTO.getSecretKey(), checkingDTO.getCreationDate(), CheckingType.STUDENT_CHECKING, checkingDTO.getStatus());
+            return checkingRepository.save(studentChecking);
         } else {
+            Checking checking = new Checking(checkingDTO.getId(), checkingDTO.getSecretKey(), checkingDTO.getCreationDate(), checkingDTO.getCheckingType(), checkingDTO.getStatus());
             return checkingRepository.save(checking);
         }
     }

@@ -43,7 +43,14 @@ public abstract class Account {
     @JoinColumn(name = "ACCOUNT_HOLDER_ID", referencedColumnName = "id")
     private AccountHolder accountHolder;
 
-    public Account(Owner primaryOwner) {
+    public Account(Owner primaryOwner, Owner secondaryOwner, AccountHolder accountHolder) {
         this.primaryOwner = primaryOwner;
+        this.secondaryOwner = secondaryOwner;
+        this.accountHolder = accountHolder;
+    }
+
+    public Account(Owner primaryOwner, AccountHolder accountHolder) {
+        this.primaryOwner = primaryOwner;
+        this.accountHolder = accountHolder;
     }
 }

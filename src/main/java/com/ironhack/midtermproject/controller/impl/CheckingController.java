@@ -1,8 +1,9 @@
 package com.ironhack.midtermproject.controller.impl;
 
+import com.ironhack.midtermproject.controller.dto.CheckingDTO;
 import com.ironhack.midtermproject.dao.AccountData.Account;
+import com.ironhack.midtermproject.dao.AccountData.Checking;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
-import com.ironhack.midtermproject.repository.AccountDataRepositories.StudentCheckingRepository;
 import com.ironhack.midtermproject.service.interfaces.ICheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,15 +21,12 @@ public class CheckingController {
     private CheckingRepository checkingRepository;
 
     @Autowired
-    private StudentCheckingRepository studentCheckingRepository;
-
-    @Autowired
     private ICheckingService checkingService;
 
     @PostMapping("/create/checking")
     @ResponseStatus(HttpStatus.CREATED)
-    public <T extends Account> T store(@RequestBody @Valid T checking) {
-        return checkingService.store(checking);
+    public Checking store(@RequestBody @Valid CheckingDTO checkingDTO) {
+        return checkingService.store(checkingDTO);
     }
 
 }

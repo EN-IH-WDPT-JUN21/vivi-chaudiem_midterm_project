@@ -4,7 +4,6 @@ import com.ironhack.midtermproject.controller.interfaces.IAccountController;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CreditCardRepository;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.SavingsRepository;
-import com.ironhack.midtermproject.repository.AccountDataRepositories.StudentCheckingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,9 +12,6 @@ public class AccountController implements IAccountController {
 
     @Autowired
     private CheckingRepository checkingRepository;
-
-    @Autowired
-    private StudentCheckingRepository studentCheckingRepository;
 
     @Autowired
     private CreditCardRepository creditCardRepository;
