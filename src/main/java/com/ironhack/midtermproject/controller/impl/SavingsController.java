@@ -17,8 +17,8 @@ public class SavingsController {
     @Autowired
     private SavingsRepository savingsRepository;
 
-//    @Autowired
-//    private ISavingsService savingsService;
+    @Autowired
+    private ISavingsService savingsService;
 
     @GetMapping("/savings")
     @ResponseStatus(HttpStatus.OK)
@@ -38,4 +38,9 @@ public class SavingsController {
         return savingsRepository.save(savings);
     }
 
+    @PatchMapping("/savings/interest/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addInterest(@PathVariable(value = "id") Long id) {
+        savingsService.addInterest(id);
+    }
 }
