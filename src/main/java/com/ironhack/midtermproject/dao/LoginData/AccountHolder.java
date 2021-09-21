@@ -1,6 +1,7 @@
 package com.ironhack.midtermproject.dao.LoginData;
 
 import com.ironhack.midtermproject.dao.AccountData.Account;
+import com.ironhack.midtermproject.dao.AccountData.Savings;
 import com.ironhack.midtermproject.dao.Address;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,13 +13,14 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@PrimaryKeyJoinColumn(name = "id")
+@PrimaryKeyJoinColumn(name = "user_id")
 public class AccountHolder extends User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +47,6 @@ public class AccountHolder extends User {
     @Embedded
     private Address mailingAddress;
 
-    @OneToMany(mappedBy = "accountHolder")
-    private List<Account> accounts;
+    @OneToOne(mappedBy = "accountHolder")
+    private Savings savings;
 }

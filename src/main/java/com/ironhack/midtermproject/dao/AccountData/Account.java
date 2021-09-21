@@ -8,15 +8,15 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-@Entity
+@MappedSuperclass
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Account {
+public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +25,7 @@ public abstract class Account {
     private final BigDecimal penaltyFee = BigDecimal.valueOf(40);
     // Will be deducted automatically if balance < minimumBalance
 
-    @NotBlank(message = "The primary owner cannot be empty or null.")
+//    @NotNull(message = "The primary owner cannot be empty or null.")
     @AttributeOverrides({
             @AttributeOverride(name = "name", column = @Column(name = "primary_owner"))
     })
@@ -38,19 +38,4 @@ public abstract class Account {
     })
     @Embedded
     private Owner secondaryOwner;
-
-    @ManyToOne
-    @JoinColumn(name = "ACCOUNT_HOLDER_ID", referencedColumnName = "id")
-    private AccountHolder accountHolder;
-
-    public Account(Owner primaryOwner, Owner secondaryOwner, AccountHolder accountHolder) {
-        this.primaryOwner = primaryOwner;
-        this.secondaryOwner = secondaryOwner;
-        this.accountHolder = accountHolder;
-    }
-
-    public Account(Owner primaryOwner, AccountHolder accountHolder) {
-        this.primaryOwner = primaryOwner;
-        this.accountHolder = accountHolder;
-    }
 }

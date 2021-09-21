@@ -18,7 +18,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@PrimaryKeyJoinColumn(name = "id")
+@PrimaryKeyJoinColumn(name = "account_id")
 public class Checking extends Account {
 
     @Id
@@ -34,7 +34,7 @@ public class Checking extends Account {
     private CheckingType checkingType = CheckingType.NORMAL_CHECKING;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.ACTIVE;
 
     // 250
     private final BigDecimal minimumBalance = BigDecimal.valueOf(250);

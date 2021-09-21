@@ -1,23 +1,19 @@
 package com.ironhack.midtermproject.controller.impl;
 
 import com.ironhack.midtermproject.controller.interfaces.IAccountController;
-import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
-import com.ironhack.midtermproject.repository.AccountDataRepositories.CreditCardRepository;
-import com.ironhack.midtermproject.repository.AccountDataRepositories.SavingsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AccountController implements IAccountController {
 
-    @Autowired
-    private CheckingRepository checkingRepository;
-
-    @Autowired
-    private CreditCardRepository creditCardRepository;
-
-    @Autowired
-    private SavingsRepository savingsRepository;
+//    @Autowired
+//    private CheckingRepository checkingRepository;
+//
+//    @Autowired
+//    private CreditCardRepository creditCardRepository;
+//
+//    @Autowired
+//    private SavingsRepository savingsRepository;
 
     // GetMapping
     // Get access to the account: AccountHolders and Admins

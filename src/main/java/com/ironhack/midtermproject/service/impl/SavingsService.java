@@ -9,18 +9,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class SavingsService implements ISavingsService {
 
-    @Autowired
-    private SavingsRepository savingsRepository;
-
-    public Savings store(Savings savings) {
-        Optional<Account> optionalSavings = savingsRepository.findById(savings.getId());
-        if(optionalSavings.isPresent()) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Savings account with id " + savings.getId() + "already exists.");
-
-        return savingsRepository.save(savings);
-    }
+//    @Autowired
+//    private SavingsRepository savingsRepository;
+//
+//    public Savings store(Savings savings) {
+//        return savingsRepository.save(savings);
+//    }
 }

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 
-@Transactional
-public interface SavingsRepository extends AccountRepository<Savings>{
+@Repository
+public interface SavingsRepository extends JpaRepository<Savings, Long> {
 }

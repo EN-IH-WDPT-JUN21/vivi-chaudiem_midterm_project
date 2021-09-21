@@ -18,13 +18,13 @@ public class SavingsController {
     @Autowired
     private SavingsRepository savingsRepository;
 
-    @Autowired
-    private ISavingsService savingsService;
+//    @Autowired
+//    private ISavingsService savingsService;
 
     @PostMapping("/create/savings")
     @ResponseStatus(HttpStatus.CREATED)
     public Savings store(@RequestBody @Valid Savings savings) {
-        return savingsService.store(savings);
+        return savingsRepository.save(savings);
     }
 
 }
