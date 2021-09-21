@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 
@@ -22,7 +23,11 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private RoleName name;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public Role(RoleName name) {
+        this.name = name;
+    }
 }

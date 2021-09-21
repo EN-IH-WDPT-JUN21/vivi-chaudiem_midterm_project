@@ -1,5 +1,6 @@
 package com.ironhack.midtermproject.dao.LoginData;
 
+import com.ironhack.midtermproject.enums.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,6 @@ public abstract class User {
     private String username;
     private String password;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Role> roles;
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+    private Role role = new Role(RoleName.ACCOUNT_HOLDER);
 }

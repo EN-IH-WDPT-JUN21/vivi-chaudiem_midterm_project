@@ -30,7 +30,7 @@ public class Savings extends Account {
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, optional = false)
     @JoinColumn(name = "account_holder_id")
     private AccountHolder accountHolder;
 
@@ -45,7 +45,7 @@ public class Savings extends Account {
 
     // Can be instantiated with less, but not less than 100
     @DecimalMin(value = "100", message = "The minimum balance for instantiation is 100.")
-    private BigDecimal minimumBalance;
+    private BigDecimal minimumBalance = BigDecimal.valueOf(1000);
 
     // Default 0,0025
     // Max. 0,5
@@ -54,12 +54,4 @@ public class Savings extends Account {
 
     // How to add: per Year, check if exists 1 year or when it got interest the last time 1 year ago
 
-    // Minimum 1000
-    public void setMinimumBalance(BigDecimal minimumBalance) {
-        if(minimumBalance.compareTo(BigDecimal.valueOf(1000)) == -1) {
-            System.out.println("The balance cannot be less than 1000.");
-        } else {
-            this.minimumBalance = minimumBalance;
-        }
-    }
 }

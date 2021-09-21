@@ -7,9 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -27,8 +29,7 @@ public class AccountHolder extends User {
     private Long id;
 
     @DateTimeFormat(pattern = "yyy-MM-dd")
-    private LocalDate dateOfBirth = LocalDate.now();
-
+    private LocalDate dateOfBirth;
 
     @AttributeOverrides({
             @AttributeOverride(name = "streetAddress", column = @Column(name = "primary_street")),
