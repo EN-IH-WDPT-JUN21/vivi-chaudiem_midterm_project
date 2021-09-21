@@ -1,6 +1,7 @@
 package com.ironhack.midtermproject.dao.LoginData;
 
 import com.ironhack.midtermproject.dao.AccountData.Account;
+import com.ironhack.midtermproject.dao.AccountData.Checking;
 import com.ironhack.midtermproject.dao.AccountData.CreditCard;
 import com.ironhack.midtermproject.dao.AccountData.Savings;
 import com.ironhack.midtermproject.dao.Address;
@@ -56,4 +57,8 @@ public class AccountHolder extends User {
     @OneToOne(mappedBy = "accountHolder")
     @JsonIgnore
     private CreditCard creditCard;
+
+    @OneToOne(mappedBy = "accountHolder")
+    @JsonIgnore
+    private Checking checking;
 }

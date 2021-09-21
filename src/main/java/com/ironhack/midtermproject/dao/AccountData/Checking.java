@@ -1,5 +1,6 @@
 package com.ironhack.midtermproject.dao.AccountData;
 
+import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
 import com.ironhack.midtermproject.enums.CheckingType;
 import com.ironhack.midtermproject.enums.Status;
 import lombok.AllArgsConstructor;
@@ -11,19 +12,21 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@PrimaryKeyJoinColumn(name = "account_id")
 public class Checking extends Account {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, optional = false)
+    @JoinColumn(name = "account_holder_id")
+    private AccountHolder accountHolder;
 
     private String secretKey;
 
@@ -31,16 +34,16 @@ public class Checking extends Account {
     private LocalDate creationDate = LocalDate.now();
 
     @Enumerated(EnumType.STRING)
-    private CheckingType checkingType = CheckingType.NORMAL_CHECKING;
+    private CheckingType checkingType = CheckingType.STANDARD_CHECKING;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
     // 250
-    private final BigDecimal minimumBalance = BigDecimal.valueOf(250);
+    private BigDecimal minimumBalance = BigDecimal.valueOf(250);
 
     // 12
-    private final BigDecimal monthlyMaintenanceFee = BigDecimal.valueOf(12);
+    private BigDecimal monthlyMaintenanceFee = BigDecimal.valueOf(12);
 
     // Check if AccountHolder is < 24 ? creation StudentCheckingAccount : normal Checking Account
 }

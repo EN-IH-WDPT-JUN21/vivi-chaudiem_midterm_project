@@ -25,7 +25,6 @@ public class Account {
     private final BigDecimal penaltyFee = BigDecimal.valueOf(40);
     // Will be deducted automatically if balance < minimumBalance
 
-//    @NotNull(message = "The primary owner cannot be empty or null.")
     @AttributeOverrides({
             @AttributeOverride(name = "name", column = @Column(name = "primary_owner"))
     })

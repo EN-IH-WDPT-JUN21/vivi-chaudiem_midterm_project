@@ -17,9 +17,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreditCard extends Account {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
 
     @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, optional = false)
     @JoinColumn(name = "account_holder_id")
