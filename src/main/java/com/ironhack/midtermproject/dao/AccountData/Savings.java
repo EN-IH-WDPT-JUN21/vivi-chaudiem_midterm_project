@@ -1,5 +1,7 @@
 package com.ironhack.midtermproject.dao.AccountData;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
 import com.ironhack.midtermproject.enums.Status;
 import lombok.AllArgsConstructor;

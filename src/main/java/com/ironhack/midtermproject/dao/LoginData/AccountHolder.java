@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.minidev.json.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -49,5 +49,6 @@ public class AccountHolder extends User {
     private Address mailingAddress;
 
     @OneToOne(mappedBy = "accountHolder")
+    @JsonIgnore
     private Savings savings;
 }

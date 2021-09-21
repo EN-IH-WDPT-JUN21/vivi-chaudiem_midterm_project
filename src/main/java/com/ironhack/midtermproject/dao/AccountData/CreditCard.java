@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@PrimaryKeyJoinColumn(name = "id")
 public class CreditCard extends Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
