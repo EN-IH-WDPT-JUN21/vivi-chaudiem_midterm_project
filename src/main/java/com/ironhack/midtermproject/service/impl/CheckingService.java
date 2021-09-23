@@ -7,6 +7,7 @@ import com.ironhack.midtermproject.service.interfaces.ICheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Optional;
@@ -43,6 +44,14 @@ public class CheckingService implements ICheckingService {
         if(optionalChecking.isPresent()) {
             checking.setId(optionalChecking.get().getId());
             checkingRepository.save(checking);
+        }
+    }
+
+    public void updateBalance(Long id, BigDecimal balance) {
+        Optional<Checking> optionalChecking = checkingRepository.findById(id);
+        if(optionalChecking.isPresent()) {
+            optionalChecking.get().setBalance(balance);
+            checkingRepository.save(optionalChecking.get());
         }
     }
 }

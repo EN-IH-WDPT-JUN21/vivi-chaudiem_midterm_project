@@ -34,11 +34,16 @@ public class Transaction {
 
     private Long accountTwoId;
 
-    private BigDecimal value;
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "amount")),
+            @AttributeOverride(name = "currency", column = @Column(name = "currency"))
+    })
+    @Embedded
+    private Money value;
 
     private LocalDate transactionDate;
 
-    public Transaction(TransactionType transactionType, AccountType accountOneType, Long accountOneId, AccountType accountTwoType, Long accountTwoId, BigDecimal value, LocalDate transactionDate) {
+    public Transaction(TransactionType transactionType, AccountType accountOneType, Long accountOneId, AccountType accountTwoType, Long accountTwoId, Money value, LocalDate transactionDate) {
         this.transactionType = transactionType;
         this.accountOneType = accountOneType;
         this.accountOneId = accountOneId;

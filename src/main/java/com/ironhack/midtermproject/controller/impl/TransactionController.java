@@ -1,8 +1,10 @@
 package com.ironhack.midtermproject.controller.impl;
 
+import com.ironhack.midtermproject.dao.Money;
 import com.ironhack.midtermproject.dao.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.repository.TransactionRepository;
+import com.ironhack.midtermproject.service.interfaces.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private ITransactionService transactionService;
 
     @GetMapping("/transactions")
     @ResponseStatus(HttpStatus.OK)
@@ -34,5 +39,13 @@ public class TransactionController {
     public List<Transaction> findByAccountOneId(@PathVariable(value="id")  Long accountOneId) {
         return transactionRepository.findByAccountOneIdAndAccountOneType(accountOneId, AccountType.SAVINGS);
     }
+
+    @PutMapping("/transfer/{value}/{sender}/{senderId}/{recipient}/{recipientId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void transferMoney(@PathVariable String value, @PathVariable(value = "sender") String senderAccountType, @PathVariable(value = "senderId") Long senderAccountId,
+                              @PathVariable(value = "recipient") String recipientAccountType, @PathVariable(value = "recipientId") Long recipientAccountId) {
+        transactionService.transferMoney(value, senderAccountType, senderAccountId, recipientAccountType, recipientAccountId);
+    }
+
 
 }

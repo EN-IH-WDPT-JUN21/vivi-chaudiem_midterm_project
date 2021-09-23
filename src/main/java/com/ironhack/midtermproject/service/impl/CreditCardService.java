@@ -1,6 +1,7 @@
 package com.ironhack.midtermproject.service.impl;
 
 import com.ironhack.midtermproject.dao.AccountData.CreditCard;
+import com.ironhack.midtermproject.dao.Money;
 import com.ironhack.midtermproject.dao.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.enums.TransactionType;
@@ -41,13 +42,15 @@ public class CreditCardService implements ICreditCardService {
 
         if(interestAddedOneMonthOrLonger || (timeDifference > 30 && hasNeverGottenAnyInterest)) {
             BigDecimal currentBalance = creditCard.getBalance();
-            BigDecimal interestToAdd = creditCard.getInterestRate().add(BigDecimal.ONE);
-            BigDecimal newBalance = currentBalance.multiply(interestToAdd);
+            BigDecimal interest = creditCard.getInterestRate();
+            BigDecimal interestValue = currentBalance.multiply(interest);
+            BigDecimal newBalance = currentBalance.add(interestValue);
 
             creditCard.setBalance(newBalance);
             creditCardRepository.save(creditCard);
 
-            Transaction transaction = new Transaction(TransactionType.INTEREST, AccountType.CREDITCARD, creditCard.getId(), null, null, currentBalance.multiply(creditCard.getInterestRate()), LocalDate.now());
+            Money newBalanceMoney = new Money(interestValue);
+            Transaction transaction = new Transaction(TransactionType.INTEREST, AccountType.CREDITCARD, creditCard.getId(), null, null, newBalanceMoney, LocalDate.now());
             transactionRepository.save(transaction);
         }
 
@@ -75,6 +78,14 @@ public class CreditCardService implements ICreditCardService {
         if(optionalCreditCard.isPresent()) {
             creditCard.setId(optionalCreditCard.get().getId());
             creditCardRepository.save(creditCard);
+        }
+    }
+
+    public void updateBalance(Long id, BigDecimal balance) {
+        Optional<CreditCard> optionalCreditCard = creditCardRepository.findById(id);
+        if(optionalCreditCard.isPresent()) {
+            optionalCreditCard.get().setBalance(balance);
+            creditCardRepository.save(optionalCreditCard.get());
         }
     }
 

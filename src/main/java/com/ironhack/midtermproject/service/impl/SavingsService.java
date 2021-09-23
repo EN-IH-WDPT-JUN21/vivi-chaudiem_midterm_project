@@ -2,6 +2,7 @@ package com.ironhack.midtermproject.service.impl;
 
 import com.ironhack.midtermproject.dao.AccountData.Account;
 import com.ironhack.midtermproject.dao.AccountData.Savings;
+import com.ironhack.midtermproject.dao.Money;
 import com.ironhack.midtermproject.dao.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.enums.TransactionType;
@@ -47,13 +48,16 @@ public class SavingsService implements ISavingsService {
 
         if(interestAddedOneYearOrLonger || (timeDifference > 365 && hasNeverGottenAnyInterest)) {
             BigDecimal currentBalance = savings.getBalance();
-            BigDecimal interestToAdd = savings.getInterestRate().add(BigDecimal.ONE);
-            BigDecimal newBalance = currentBalance.multiply(interestToAdd);
+            BigDecimal interest = savings.getInterestRate();
+            BigDecimal interestValue = currentBalance.multiply(interest);
+            BigDecimal newBalance = currentBalance.add(interestValue);
+
 
             savings.setBalance(newBalance);
             savingsRepository.save(savings);
 
-            Transaction transaction = new Transaction(TransactionType.INTEREST, AccountType.SAVINGS, savings.getId(), null, null, currentBalance.multiply(savings.getInterestRate()), LocalDate.now());
+            Money newBalanceMoney = new Money(interestValue);
+            Transaction transaction = new Transaction(TransactionType.INTEREST, AccountType.SAVINGS, savings.getId(), null, null, newBalanceMoney, LocalDate.now());
             transactionRepository.save(transaction);
         }
 
@@ -91,4 +95,13 @@ public class SavingsService implements ISavingsService {
             savingsRepository.save(savings);
         }
     }
+
+    public void updateBalance(Long id, BigDecimal balance) {
+        Optional<Savings> optionalSavings = savingsRepository.findById(id);
+        if(optionalSavings.isPresent()) {
+            optionalSavings.get().setBalance(balance);
+            savingsRepository.save(optionalSavings.get());
+        }
+    }
+
 }
