@@ -30,9 +30,6 @@ public class Checking extends Account {
 
     private String secretKey;
 
-    @DateTimeFormat(pattern = "yyy-MM-dd")
-    private LocalDate creationDate = LocalDate.now();
-
     @Enumerated(EnumType.STRING)
     private CheckingType checkingType = CheckingType.STANDARD_CHECKING;
 

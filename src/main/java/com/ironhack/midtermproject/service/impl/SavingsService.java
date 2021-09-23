@@ -19,6 +19,8 @@ import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 @Service
 public class SavingsService implements ISavingsService {
 
@@ -47,7 +49,7 @@ public class SavingsService implements ISavingsService {
         int timeDifference = calculateTimeDifference(savings.getCreationDate(), LocalDate.now());
         boolean hasNeverGottenAnyInterest = hasNeverGottenAnyInterest(id);
 
-        if(interestAddedOneYearOrLonger || (timeDifference > 1 && hasNeverGottenAnyInterest)) {
+        if(interestAddedOneYearOrLonger || (timeDifference > 365 && hasNeverGottenAnyInterest)) {
             BigDecimal currentBalance = savings.getBalance();
             BigDecimal interestToAdd = savings.getInterestRate().add(BigDecimal.ONE);
             BigDecimal newBalance = currentBalance.multiply(interestToAdd);
@@ -58,12 +60,13 @@ public class SavingsService implements ISavingsService {
             Transaction transaction = new Transaction(TransactionType.INTEREST, AccountType.SAVINGS, savings.getId(), null, null, currentBalance.multiply(savings.getInterestRate()), LocalDate.now());
             transactionRepository.save(transaction);
         }
+
     }
 
     public boolean interestAddedOneYearOrLonger(Long id) {
-        List<Transaction> transactionList = transactionRepository.findByAccountOneId(id);
+        List<Transaction> transactionList = transactionRepository.findByAccountOneIdAndAccountOneType(id, AccountType.SAVINGS);
         for(Transaction transaction : transactionList) {
-            if(transaction.getTransactionType() == TransactionType.INTEREST) {
+            if(transaction.getTransactionType() == TransactionType.INTEREST && transaction.getAccountOneType() == AccountType.SAVINGS) {
                 int timeDifference = calculateTimeDifference(transaction.getTransactionDate(), LocalDate.now());
                 if(timeDifference > 365) return true;
             }
@@ -73,14 +76,14 @@ public class SavingsService implements ISavingsService {
 
     public static int calculateTimeDifference(LocalDate date, LocalDate currentDate) {
         if(date != null && currentDate != null) {
-            return Period.between(date, currentDate).getYears();
+            return (int) DAYS.between(date, currentDate);
         } else {
             return 0;
         }
     }
 
     public boolean hasNeverGottenAnyInterest(Long id) {
-        List<Transaction> transactionList = transactionRepository.findByAccountOneId(id);
+        List<Transaction> transactionList = transactionRepository.findByAccountOneIdAndAccountOneType(id, AccountType.SAVINGS);
         if(transactionList.isEmpty()) return true;
         return false;
     }

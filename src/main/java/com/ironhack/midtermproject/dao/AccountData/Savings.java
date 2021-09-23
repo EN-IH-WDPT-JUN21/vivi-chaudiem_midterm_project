@@ -39,9 +39,6 @@ public class Savings extends Account {
     @NotBlank(message = "The secret key cannot be empty or null.")
     private String secretKey;
 
-    @DateTimeFormat(pattern = "yyy-MM-dd")
-    private LocalDate creationDate = LocalDate.now();
-
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 

@@ -1,6 +1,7 @@
 package com.ironhack.midtermproject.controller.impl;
 
 import com.ironhack.midtermproject.dao.Transaction;
+import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class TransactionController {
     @GetMapping("/transactions/savings/{id}")
     @ResponseStatus(HttpStatus.OK)
     public List<Transaction> findByAccountOneId(@PathVariable(value="id")  Long accountOneId) {
-        return transactionRepository.findByAccountOneId(accountOneId);
+        return transactionRepository.findByAccountOneIdAndAccountOneType(accountOneId, AccountType.SAVINGS);
     }
 
 }

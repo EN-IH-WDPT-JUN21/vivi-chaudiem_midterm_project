@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @MappedSuperclass
 @Getter
@@ -37,4 +39,7 @@ public class Account {
     })
     @Embedded
     private Owner secondaryOwner;
+
+    @DateTimeFormat(pattern = "yyy-MM-dd")
+    private LocalDate creationDate = LocalDate.now();
 }
