@@ -30,10 +30,6 @@ public class SavingsService implements ISavingsService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-//    public Savings store(Savings savings) {
-//        return savingsRepository.save(savings);
-//    }
-
     public void addInterest(Long id) {
         Optional<Savings> savingsAccount = savingsRepository.findById(id);
 
@@ -88,4 +84,11 @@ public class SavingsService implements ISavingsService {
         return false;
     }
 
+    public void update(Long id, Savings savings) {
+        Optional<Savings> optionalSavings = savingsRepository.findById(id);
+        if(optionalSavings.isPresent()) {
+            savings.setId(optionalSavings.get().getId());
+            savingsRepository.save(savings);
+        }
+    }
 }

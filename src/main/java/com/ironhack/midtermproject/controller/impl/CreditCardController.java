@@ -44,4 +44,10 @@ public class CreditCardController {
         creditCardService.addInterest(id);
     }
 
+    @PutMapping("/modify/creditcard/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid CreditCard creditCard) {
+        creditCardService.update(id, creditCard);
+    }
+
 }

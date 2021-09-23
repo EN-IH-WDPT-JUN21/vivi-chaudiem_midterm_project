@@ -26,13 +26,6 @@ public class CreditCardService implements ICreditCardService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-//    public CreditCard store(CreditCard creditCard) {
-//        Optional<Account> optionalCreditCard = creditCardRepository.findById(creditCard.getId());
-//        if(optionalCreditCard.isPresent()) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Credit card account with id " + creditCard.getId() + "already exists.");
-//
-//        return creditCardRepository.save(creditCard);
-//    }
-
     public void addInterest(Long id) {
         Optional<CreditCard> optionalCreditCard = creditCardRepository.findById(id);
 
@@ -77,5 +70,12 @@ public class CreditCardService implements ICreditCardService {
         return false;
     }
 
+    public void update(Long id, CreditCard creditCard) {
+        Optional<CreditCard> optionalCreditCard = creditCardRepository.findById(id);
+        if(optionalCreditCard.isPresent()) {
+            creditCard.setId(optionalCreditCard.get().getId());
+            creditCardRepository.save(creditCard);
+        }
+    }
 
 }

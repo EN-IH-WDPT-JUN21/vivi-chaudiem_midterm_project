@@ -43,4 +43,10 @@ public class SavingsController {
     public void addInterest(@PathVariable(value = "id") Long id) {
         savingsService.addInterest(id);
     }
+
+    @PutMapping("/modify/savings/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid Savings savings) {
+        savingsService.update(id, savings);
+    }
 }

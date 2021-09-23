@@ -15,8 +15,8 @@ public class AccountController implements IAccountController {
 //    @Autowired
 //    private SavingsRepository savingsRepository;
 
-    // GetMapping
-    // Get access to the account: AccountHolders and Admins
+    // TODO:
+    // Authentication & Co
 
     // PutMapping
     // Send Money to another Account: AccountHolders, ThirdPartyAccount
@@ -31,15 +31,21 @@ public class AccountController implements IAccountController {
     // Deposit Money to Account: AccountHolders
 
     // PostMapping
+    // ThirdParty Accounts?
+
+
+    // ***Done***
+
+    // GetMapping
+    // Get access to the account: AccountHolders and Admins
+
+    // PutMapping
+    // Add InterestRate
+
+    // PostMapping
     // Create new Accounts (Checking, Savings, CreditCard): Admins
     // @PostMapping("/create/checking")
 
     // PutMapping
     // Modify data of the account: Admins
-
-    // PostMapping
-    // ThirdParty Accounts?
-
-    // PutMapping
-    // Add InterestRate
 }

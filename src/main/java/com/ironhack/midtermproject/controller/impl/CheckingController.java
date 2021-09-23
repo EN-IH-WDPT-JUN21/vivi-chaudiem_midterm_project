@@ -38,4 +38,9 @@ public class CheckingController {
         return checkingService.store(checking);
     }
 
+    @PutMapping("/modify/checking/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid Checking checking) {
+        checkingService.update(id, checking);
+    }
 }
