@@ -43,7 +43,8 @@ public class CreditCardService implements ICreditCardService {
         if(interestAddedOneMonthOrLonger || (timeDifference > 30 && hasNeverGottenAnyInterest)) {
             BigDecimal currentBalance = creditCard.getBalance();
             BigDecimal interest = creditCard.getInterestRate();
-            BigDecimal interestValue = currentBalance.multiply(interest);
+            BigDecimal interestPerMonth = interest.divide(BigDecimal.valueOf(2));
+            BigDecimal interestValue = currentBalance.multiply(interestPerMonth);
             BigDecimal newBalance = currentBalance.add(interestValue);
 
             creditCard.setBalance(newBalance);

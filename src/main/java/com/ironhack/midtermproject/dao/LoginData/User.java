@@ -1,13 +1,16 @@
 package com.ironhack.midtermproject.dao.LoginData;
 
-import com.ironhack.midtermproject.enums.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.util.Set;
+
+import static com.ironhack.midtermproject.utils.PasswordUtil.encryptedPassword;
 
 @Entity
 @Getter
@@ -15,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +27,15 @@ public abstract class User {
     private String username;
     private String password;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade=CascadeType.ALL)
-    private Role role = new Role(RoleName.ACCOUNT_HOLDER);
+    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, optional = false)
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+//    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    private Set<Role> roles;
+
+
+    public void setPassword(String password) {
+        this.password = encryptedPassword(password);
+    }
 }

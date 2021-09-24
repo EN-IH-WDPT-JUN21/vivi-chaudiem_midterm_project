@@ -3,6 +3,7 @@ package com.ironhack.midtermproject.service.impl;
 import com.ironhack.midtermproject.dao.AccountData.Checking;
 import com.ironhack.midtermproject.enums.CheckingType;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
+import com.ironhack.midtermproject.repository.LoginDataRepositories.AccountHolderRepository;
 import com.ironhack.midtermproject.service.interfaces.ICheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class CheckingService implements ICheckingService {
     @Autowired
     private CheckingRepository checkingRepository;
 
+    @Autowired
+    private AccountHolderRepository accountHolderRepository;
+
     public Checking store(Checking checking) {
         // Create a student checking account if the account holder is younger than 24
         int age = calculateAge(checking.getAccountHolder().getDateOfBirth(), LocalDate.now());
@@ -27,6 +31,7 @@ public class CheckingService implements ICheckingService {
             checking.setMinimumBalance(null);
             checking.setMonthlyMaintenanceFee(null);
         }
+//        accountHolderRepository.save(checking.getAccountHolder());
         return checkingRepository.save(checking);
     }
 

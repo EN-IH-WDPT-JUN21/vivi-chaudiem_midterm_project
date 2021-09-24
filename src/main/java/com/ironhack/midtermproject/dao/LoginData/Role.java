@@ -1,11 +1,10 @@
 package com.ironhack.midtermproject.dao.LoginData;
 
-import com.ironhack.midtermproject.enums.RoleName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 
@@ -20,14 +19,17 @@ public class Role {
     private Long id;
 
     // String or enum?
-    @Enumerated(EnumType.STRING)
-    private RoleName name;
+    private String name;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(mappedBy = "role")
+    @JsonIgnore
     private User user;
 
-    public Role(RoleName name) {
+    public Role(String name) {
         this.name = name;
     }
+
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
 }

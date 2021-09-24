@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Account {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     private BigDecimal balance = BigDecimal.valueOf(0);
@@ -43,3 +43,27 @@ public class Account {
     @DateTimeFormat(pattern = "yyy-MM-dd")
     private LocalDate creationDate = LocalDate.now();
 }
+
+/*
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "accounts")
+public class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long accountId;
+    private Money balance;
+    private String secretKey;
+    @ManyToOne
+    @NotNull
+    @Valid
+    @JoinColumn(name = "account_holder")
+    private AccountHolder accountHolder;
+    @ManyToOne
+    @Valid
+    @JoinColumn(name = "secondary_account_holder")
+    private AccountHolder secondaryAccountHolder;
+    private LocalDateTime creationDate;
+
+    ThirdPartyTransaction class
+ */

@@ -48,6 +48,8 @@ public class TransactionService implements ITransactionService {
         Account recipient = null;
         AccountType senderAccountType = null;
         AccountType recipientAccountType = null;
+        BigDecimal minimumBalanceSender = null;
+        BigDecimal minimumBalanceRecipient = null;
 
         // Determine the specific sender account
         switch(senderAccount.toUpperCase()) {
@@ -107,6 +109,7 @@ public class TransactionService implements ITransactionService {
         Money valueAsMoney = new Money(BigDecimal.valueOf(Long.parseLong(value)));
         BigDecimal amount = valueAsMoney.getAmount();
         BigDecimal senderBalance = sender.getBalance().subtract(amount);
+
         BigDecimal recipientBalance = recipient.getBalance().add(amount);
 
         // Update the balances

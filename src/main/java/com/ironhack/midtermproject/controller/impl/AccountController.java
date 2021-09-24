@@ -18,11 +18,7 @@ public class AccountController implements IAccountController {
     // TODO:
     // Authentication & Co
 
-    // PutMapping
-    // Send Money to another Account: AccountHolders, ThirdPartyAccount
 
-    // PutMapping
-    // Get Money from another Account: AccountHolders, ThirdPartyAccount
 
     // PostMapping
     // ThirdParty Accounts?
@@ -50,4 +46,10 @@ public class AccountController implements IAccountController {
 
     // PutMapping
     // Modify data of the account: Admins
+
+    // PutMapping
+    // Send Money to another Account: AccountHolders, ThirdPartyAccount
+
+    // PutMapping
+    // Get Money from another Account: AccountHolders, ThirdPartyAccount
 }
