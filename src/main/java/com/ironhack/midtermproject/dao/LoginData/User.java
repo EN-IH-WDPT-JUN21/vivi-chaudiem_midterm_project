@@ -27,15 +27,16 @@ public class User {
     private String username;
     private String password;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
     @JoinColumn(name = "role_id")
     private Role role;
 
 //    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 //    private Set<Role> roles;
 
-
     public void setPassword(String password) {
         this.password = encryptedPassword(password);
     }
+
+
 }

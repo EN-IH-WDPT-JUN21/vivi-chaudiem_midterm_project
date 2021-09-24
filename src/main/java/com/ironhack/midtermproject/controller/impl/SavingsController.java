@@ -1,5 +1,7 @@
 package com.ironhack.midtermproject.controller.impl;
 
+import com.ironhack.midtermproject.controller.interfaces.ISavingsController;
+import com.ironhack.midtermproject.dao.AccountData.Owner;
 import com.ironhack.midtermproject.dao.AccountData.Savings;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.SavingsRepository;
 import com.ironhack.midtermproject.service.interfaces.IAccountService;
@@ -11,9 +13,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-public class SavingsController {
+public class SavingsController implements ISavingsController {
 
     @Autowired
     private SavingsRepository savingsRepository;
@@ -49,5 +52,19 @@ public class SavingsController {
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid Savings savings) {
         savingsService.update(id, savings);
+    }
+
+    @GetMapping(value = "/savings", params = {"id", "primaryOwner"})
+    @ResponseStatus(HttpStatus.OK)
+    public Savings getSavingsByIdAndPrimaryOwner(@RequestParam long id, @RequestParam String primaryOwner) {
+        Owner owner = new Owner(primaryOwner);
+        return savingsRepository.findByIdAndPrimaryOwner(id, owner);
+    }
+
+    @GetMapping(value = "/savings", params = {"id", "secondaryOwner"})
+    @ResponseStatus(HttpStatus.OK)
+    public Savings getSavingsByIdAndSecondaryOwner(@RequestParam long id, @RequestParam String secondaryOwner) {
+        Owner owner = new Owner(secondaryOwner);
+        return savingsRepository.findByIdAndSecondaryOwner(id, owner);
     }
 }

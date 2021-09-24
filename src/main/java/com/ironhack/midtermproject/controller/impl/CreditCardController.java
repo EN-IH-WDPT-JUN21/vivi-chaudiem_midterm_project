@@ -1,6 +1,9 @@
 package com.ironhack.midtermproject.controller.impl;
 
+import com.ironhack.midtermproject.controller.interfaces.ICreditCardController;
 import com.ironhack.midtermproject.dao.AccountData.CreditCard;
+import com.ironhack.midtermproject.dao.AccountData.Owner;
+import com.ironhack.midtermproject.dao.AccountData.Savings;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CreditCardRepository;
 import com.ironhack.midtermproject.service.interfaces.ICreditCardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +15,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-public class CreditCardController {
+public class CreditCardController implements ICreditCardController {
 
     @Autowired
     private CreditCardRepository creditCardRepository;
@@ -48,6 +51,20 @@ public class CreditCardController {
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid CreditCard creditCard) {
         creditCardService.update(id, creditCard);
+    }
+
+    @GetMapping(value = "/creditcard", params = {"id", "primaryOwner"})
+    @ResponseStatus(HttpStatus.OK)
+    public CreditCard getCreditCardByIdAndPrimaryOwner(@RequestParam long id, @RequestParam String primaryOwner) {
+        Owner owner = new Owner(primaryOwner);
+        return creditCardRepository.findByIdAndPrimaryOwner(id, owner);
+    }
+
+    @GetMapping(value = "/creditcard", params = {"id", "secondaryOwner"})
+    @ResponseStatus(HttpStatus.OK)
+    public CreditCard getCreditCardByIdAndSecondaryOwner(@RequestParam long id, @RequestParam String secondaryOwner) {
+        Owner owner = new Owner(secondaryOwner);
+        return creditCardRepository.findByIdAndSecondaryOwner(id, owner);
     }
 
 }

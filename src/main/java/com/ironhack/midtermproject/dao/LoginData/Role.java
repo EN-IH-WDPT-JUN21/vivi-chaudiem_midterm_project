@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class Role {
         this.name = name;
     }
 
-//    @ManyToOne
+    //    @ManyToOne
 //    @JoinColumn(name = "user_id")
 //    private User user;
 }

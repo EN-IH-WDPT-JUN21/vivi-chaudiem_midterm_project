@@ -40,12 +40,12 @@ public class TransactionController {
         return transactionRepository.findByAccountOneIdAndAccountOneType(accountOneId, AccountType.SAVINGS);
     }
 
-    @PutMapping("/transfer/{value}/{sender}/{senderId}/{recipient}/{recipientId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void transferMoney(@PathVariable String value, @PathVariable(value = "sender") String senderAccountType, @PathVariable(value = "senderId") Long senderAccountId,
-                              @PathVariable(value = "recipient") String recipientAccountType, @PathVariable(value = "recipientId") Long recipientAccountId) {
-        transactionService.transferMoney(value, senderAccountType, senderAccountId, recipientAccountType, recipientAccountId);
-    }
+//    @PutMapping("/transfer/{value}/{sender}/{senderId}/{recipient}/{recipientId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public void transferMoney(@PathVariable String value, @PathVariable(value = "sender") String senderAccountType, @PathVariable(value = "senderId") Long senderAccountId,
+//                              @PathVariable(value = "recipient") String recipientAccountType, @PathVariable(value = "recipientId") Long recipientAccountId) {
+//        transactionService.transferMoney(value, senderAccountType, senderAccountId, recipientAccountType, recipientAccountId);
+//    }
 
 
 }

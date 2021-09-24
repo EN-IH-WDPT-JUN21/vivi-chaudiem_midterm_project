@@ -22,122 +22,126 @@ import java.util.Optional;
 
 @Service
 public class TransactionService implements ITransactionService {
-    @Autowired
-    private TransactionRepository transactionRepository;
+//    @Autowired
+//    private TransactionRepository transactionRepository;
+//
+//    @Autowired
+//    private CheckingRepository checkingRepository;
+//
+//    @Autowired
+//    private CreditCardRepository creditCardRepository;
+//
+//    @Autowired
+//    private SavingsRepository savingsRepository;
+//
+//    @Autowired
+//    private CheckingService checkingService;
+//
+//    @Autowired
+//    private CreditCardService creditCardService;
+//
+//    @Autowired
+//    private SavingsService savingsService;
 
-    @Autowired
-    private CheckingRepository checkingRepository;
+//    public void transferMoney(String value, String primaryOwner, String secondaryOwner, Long accountId) {
+//
+//    }
 
-    @Autowired
-    private CreditCardRepository creditCardRepository;
-
-    @Autowired
-    private SavingsRepository savingsRepository;
-
-    @Autowired
-    private CheckingService checkingService;
-
-    @Autowired
-    private CreditCardService creditCardService;
-
-    @Autowired
-    private SavingsService savingsService;
-
-    public void transferMoney(String value, String senderAccount, Long senderAccountId, String recipientAccount, Long recipientAccountId) {
-        Account sender = null;
-        Account recipient = null;
-        AccountType senderAccountType = null;
-        AccountType recipientAccountType = null;
-        BigDecimal minimumBalanceSender = null;
-        BigDecimal minimumBalanceRecipient = null;
-
-        // Determine the specific sender account
-        switch(senderAccount.toUpperCase()) {
-            case "CHECKING":
-                Optional<Checking> checkingOptional = checkingRepository.findById(senderAccountId);
-                if(checkingOptional.isPresent()) {
-                    sender = checkingOptional.get();
-                    senderAccountType = AccountType.CHECKING;
-                }
-                break;
-
-            case "SAVINGS":
-                Optional<Savings> savingsOptional = savingsRepository.findById(senderAccountId);
-                if(savingsOptional.isPresent()) {
-                    sender = savingsOptional.get();
-                    senderAccountType = AccountType.SAVINGS;
-                }
-                break;
-
-            case "CREDITCARD":
-                Optional<CreditCard> creditCardOptional = creditCardRepository.findById(senderAccountId);
-                if(creditCardOptional.isPresent()) {
-                    sender = creditCardOptional.get();
-                    senderAccountType = AccountType.CREDITCARD;
-                }
-                break;
-        }
-
-        // Determine the specific recipient account
-        switch(recipientAccount.toUpperCase()) {
-            case "CHECKING":
-                Optional<Checking> checkingOptional = checkingRepository.findById(recipientAccountId);
-                if(checkingOptional.isPresent()) {
-                    recipient = checkingOptional.get();
-                    recipientAccountType = AccountType.CHECKING;
-                }
-                break;
-
-            case "SAVINGS":
-                Optional<Savings> savingsOptional = savingsRepository.findById(recipientAccountId);
-                if(savingsOptional.isPresent()) {
-                    recipient = savingsOptional.get();
-                    recipientAccountType = AccountType.SAVINGS;
-                }
-                break;
-
-            case "CREDITCARD":
-                Optional<CreditCard> creditCardOptional = creditCardRepository.findById(recipientAccountId);
-                if(creditCardOptional.isPresent()) {
-                    recipient = creditCardOptional.get();
-                    recipientAccountType = AccountType.CREDITCARD;
-                }
-                break;
-        }
-
-        // Calculate new balances
-        Money valueAsMoney = new Money(BigDecimal.valueOf(Long.parseLong(value)));
-        BigDecimal amount = valueAsMoney.getAmount();
-        BigDecimal senderBalance = sender.getBalance().subtract(amount);
-
-        BigDecimal recipientBalance = recipient.getBalance().add(amount);
-
-        // Update the balances
-        switch(senderAccountType) {
-            case CHECKING:
-                checkingService.updateBalance(sender.getId(), senderBalance);
-                break;
-            case SAVINGS:
-                savingsService.updateBalance(sender.getId(), senderBalance);
-                break;
-            case CREDITCARD:
-                creditCardService.updateBalance(sender.getId(), senderBalance);
-                break;
-        }
-
-        switch(recipientAccountType) {
-            case CHECKING:
-                checkingService.updateBalance(recipient.getId(), recipientBalance);
-                break;
-            case SAVINGS:
-                savingsService.updateBalance(recipient.getId(), recipientBalance);
-                break;
-            case CREDITCARD:
-                creditCardService.updateBalance(recipient.getId(), recipientBalance);
-                break;
-        }
-
-        Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, sender.getId(), recipientAccountType, recipient.getId(), valueAsMoney, LocalDate.now());
-        transactionRepository.save(transaction);
-    }
+//    public void transferMoney(String value, String senderAccount, Long senderAccountId, String recipientAccount, Long recipientAccountId) {
+//        Account sender = null;
+//        Account recipient = null;
+//        AccountType senderAccountType = null;
+//        AccountType recipientAccountType = null;
+//        BigDecimal minimumBalanceSender = null;
+//        BigDecimal minimumBalanceRecipient = null;
+//
+//        // Determine the specific sender account
+//        switch(senderAccount.toUpperCase()) {
+//            case "CHECKING":
+//                Optional<Checking> checkingOptional = checkingRepository.findById(senderAccountId);
+//                if(checkingOptional.isPresent()) {
+//                    sender = checkingOptional.get();
+//                    senderAccountType = AccountType.CHECKING;
+//                }
+//                break;
+//
+//            case "SAVINGS":
+//                Optional<Savings> savingsOptional = savingsRepository.findById(senderAccountId);
+//                if(savingsOptional.isPresent()) {
+//                    sender = savingsOptional.get();
+//                    senderAccountType = AccountType.SAVINGS;
+//                }
+//                break;
+//
+//            case "CREDITCARD":
+//                Optional<CreditCard> creditCardOptional = creditCardRepository.findById(senderAccountId);
+//                if(creditCardOptional.isPresent()) {
+//                    sender = creditCardOptional.get();
+//                    senderAccountType = AccountType.CREDITCARD;
+//                }
+//                break;
+//        }
+//
+//        // Determine the specific recipient account
+//        switch(recipientAccount.toUpperCase()) {
+//            case "CHECKING":
+//                Optional<Checking> checkingOptional = checkingRepository.findById(recipientAccountId);
+//                if(checkingOptional.isPresent()) {
+//                    recipient = checkingOptional.get();
+//                    recipientAccountType = AccountType.CHECKING;
+//                }
+//                break;
+//
+//            case "SAVINGS":
+//                Optional<Savings> savingsOptional = savingsRepository.findById(recipientAccountId);
+//                if(savingsOptional.isPresent()) {
+//                    recipient = savingsOptional.get();
+//                    recipientAccountType = AccountType.SAVINGS;
+//                }
+//                break;
+//
+//            case "CREDITCARD":
+//                Optional<CreditCard> creditCardOptional = creditCardRepository.findById(recipientAccountId);
+//                if(creditCardOptional.isPresent()) {
+//                    recipient = creditCardOptional.get();
+//                    recipientAccountType = AccountType.CREDITCARD;
+//                }
+//                break;
+//        }
+//
+//        // Calculate new balances
+//        Money valueAsMoney = new Money(BigDecimal.valueOf(Long.parseLong(value)));
+//        BigDecimal amount = valueAsMoney.getAmount();
+//        BigDecimal senderBalance = sender.getBalance().subtract(amount);
+//
+//        BigDecimal recipientBalance = recipient.getBalance().add(amount);
+//
+//        // Update the balances
+//        switch(senderAccountType) {
+//            case CHECKING:
+//                checkingService.updateBalance(sender.getId(), senderBalance);
+//                break;
+//            case SAVINGS:
+//                savingsService.updateBalance(sender.getId(), senderBalance);
+//                break;
+//            case CREDITCARD:
+//                creditCardService.updateBalance(sender.getId(), senderBalance);
+//                break;
+//        }
+//
+//        switch(recipientAccountType) {
+//            case CHECKING:
+//                checkingService.updateBalance(recipient.getId(), recipientBalance);
+//                break;
+//            case SAVINGS:
+//                savingsService.updateBalance(recipient.getId(), recipientBalance);
+//                break;
+//            case CREDITCARD:
+//                creditCardService.updateBalance(recipient.getId(), recipientBalance);
+//                break;
+//        }
+//
+//        Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, sender.getId(), recipientAccountType, recipient.getId(), valueAsMoney, LocalDate.now());
+//        transactionRepository.save(transaction);
+//    }
 }

@@ -36,7 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.httpBasic();
         http.csrf().disable();
         http.authorizeRequests()
-                .mvcMatchers(HttpMethod.GET, "/savings").hasRole("ACCOUNT_HOLDER")
+//                .mvcMatchers(HttpMethod.GET, "/savings").hasRole("ACCOUNT_HOLDER")
                 .anyRequest().permitAll();
     }
 }
