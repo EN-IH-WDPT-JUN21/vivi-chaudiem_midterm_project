@@ -2,7 +2,6 @@ package com.ironhack.midtermproject.controller.impl;
 
 import com.ironhack.midtermproject.controller.interfaces.ICheckingController;
 import com.ironhack.midtermproject.dao.AccountData.Checking;
-import com.ironhack.midtermproject.dao.AccountData.CreditCard;
 import com.ironhack.midtermproject.dao.AccountData.Owner;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
 import com.ironhack.midtermproject.service.interfaces.ICheckingService;
@@ -13,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class CheckingController implements ICheckingController {
@@ -49,14 +49,14 @@ public class CheckingController implements ICheckingController {
 
     @GetMapping(value = "/checking", params = {"id", "primaryOwner"})
     @ResponseStatus(HttpStatus.OK)
-    public Checking getCheckingByIdAndPrimaryOwner(@RequestParam long id, @RequestParam String primaryOwner) {
+    public Optional<Checking> getCheckingByIdAndPrimaryOwner(@RequestParam long id, @RequestParam String primaryOwner) {
         Owner owner = new Owner(primaryOwner);
         return checkingRepository.findByIdAndPrimaryOwner(id, owner);
     }
 
     @GetMapping(value = "/checking", params = {"id", "secondaryOwner"})
     @ResponseStatus(HttpStatus.OK)
-    public Checking getCheckingByIdAndSecondaryOwner(@RequestParam long id, @RequestParam String secondaryOwner) {
+    public Optional<Checking> getCheckingByIdAndSecondaryOwner(@RequestParam long id, @RequestParam String secondaryOwner) {
         Owner owner = new Owner(secondaryOwner);
         return checkingRepository.findByIdAndSecondaryOwner(id, owner);
     }

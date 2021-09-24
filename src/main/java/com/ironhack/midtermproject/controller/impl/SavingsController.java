@@ -4,7 +4,6 @@ import com.ironhack.midtermproject.controller.interfaces.ISavingsController;
 import com.ironhack.midtermproject.dao.AccountData.Owner;
 import com.ironhack.midtermproject.dao.AccountData.Savings;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.SavingsRepository;
-import com.ironhack.midtermproject.service.interfaces.IAccountService;
 import com.ironhack.midtermproject.service.interfaces.ISavingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,14 +55,14 @@ public class SavingsController implements ISavingsController {
 
     @GetMapping(value = "/savings", params = {"id", "primaryOwner"})
     @ResponseStatus(HttpStatus.OK)
-    public Savings getSavingsByIdAndPrimaryOwner(@RequestParam long id, @RequestParam String primaryOwner) {
+    public Optional<Savings> getSavingsByIdAndPrimaryOwner(@RequestParam long id, @RequestParam String primaryOwner) {
         Owner owner = new Owner(primaryOwner);
         return savingsRepository.findByIdAndPrimaryOwner(id, owner);
     }
 
     @GetMapping(value = "/savings", params = {"id", "secondaryOwner"})
     @ResponseStatus(HttpStatus.OK)
-    public Savings getSavingsByIdAndSecondaryOwner(@RequestParam long id, @RequestParam String secondaryOwner) {
+    public Optional<Savings> getSavingsByIdAndSecondaryOwner(@RequestParam long id, @RequestParam String secondaryOwner) {
         Owner owner = new Owner(secondaryOwner);
         return savingsRepository.findByIdAndSecondaryOwner(id, owner);
     }

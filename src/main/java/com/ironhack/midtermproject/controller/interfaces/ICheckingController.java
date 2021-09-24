@@ -2,7 +2,9 @@ package com.ironhack.midtermproject.controller.interfaces;
 
 import com.ironhack.midtermproject.dao.AccountData.Checking;
 
+import java.util.Optional;
+
 public interface ICheckingController {
-    Checking getCheckingByIdAndPrimaryOwner(long id, String primaryOwner);
-    Checking getCheckingByIdAndSecondaryOwner(long id, String secondaryOwner);
+    Optional<Checking> getCheckingByIdAndPrimaryOwner(long id, String primaryOwner);
+    Optional<Checking> getCheckingByIdAndSecondaryOwner(long id, String secondaryOwner);
 }

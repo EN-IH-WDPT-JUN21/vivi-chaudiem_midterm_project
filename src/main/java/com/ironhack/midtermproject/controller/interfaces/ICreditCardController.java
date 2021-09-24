@@ -2,7 +2,9 @@ package com.ironhack.midtermproject.controller.interfaces;
 
 import com.ironhack.midtermproject.dao.AccountData.CreditCard;
 
+import java.util.Optional;
+
 public interface ICreditCardController {
-    CreditCard getCreditCardByIdAndPrimaryOwner(long id, String primaryOwner);
-    CreditCard getCreditCardByIdAndSecondaryOwner(long id, String secondaryOwner);
+    Optional<CreditCard> getCreditCardByIdAndPrimaryOwner(long id, String primaryOwner);
+    Optional<CreditCard> getCreditCardByIdAndSecondaryOwner(long id, String secondaryOwner);
 }
