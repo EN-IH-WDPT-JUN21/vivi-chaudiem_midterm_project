@@ -48,7 +48,6 @@ public class CheckingController implements ICheckingController {
         checkingService.updateBalance(id, balanceDTO.getBalance());
     }
 
-
     @GetMapping(value = "/checking", params = {"id", "primaryOwner"})
     @ResponseStatus(HttpStatus.OK)
     public Optional<Checking> getCheckingByIdAndPrimaryOwner(@RequestParam long id, @RequestParam String primaryOwner) {

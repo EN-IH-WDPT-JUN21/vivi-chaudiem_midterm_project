@@ -1,10 +1,9 @@
 package com.ironhack.midtermproject.controller.impl;
 
-import com.ironhack.midtermproject.controller.interfaces.IAccountController;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class AccountController implements IAccountController {
+public class AccountController {
 
 //    @Autowired
 //    private CheckingRepository checkingRepository;

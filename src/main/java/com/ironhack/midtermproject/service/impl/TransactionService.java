@@ -2,6 +2,7 @@ package com.ironhack.midtermproject.service.impl;
 
 import com.ironhack.midtermproject.dao.AccountData.*;
 import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
+import com.ironhack.midtermproject.dao.LoginData.ThirdParty;
 import com.ironhack.midtermproject.dao.LoginData.User;
 import com.ironhack.midtermproject.dao.Money;
 import com.ironhack.midtermproject.dao.Transaction;
@@ -12,6 +13,7 @@ import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRe
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CreditCardRepository;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.SavingsRepository;
 import com.ironhack.midtermproject.repository.LoginDataRepositories.AccountHolderRepository;
+import com.ironhack.midtermproject.repository.LoginDataRepositories.ThirdPartyRepository;
 import com.ironhack.midtermproject.repository.LoginDataRepositories.UserRepository;
 import com.ironhack.midtermproject.repository.TransactionRepository;
 import com.ironhack.midtermproject.service.interfaces.ITransactionService;
@@ -54,6 +56,9 @@ public class TransactionService implements ITransactionService {
 
     @Autowired
     private AccountHolderRepository accountHolderRepository;
+
+    @Autowired
+    private ThirdPartyRepository thirdPartyRepository;
 
     public void transferMoney(String accountType, String value, String ownerString, Long accountId) {
         // Transform input values
@@ -120,6 +125,11 @@ public class TransactionService implements ITransactionService {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not enough money!");
                     }
                     break;
+                case "THIRD_PARTY":
+                    Optional<ThirdParty> optionalThirdParty = thirdPartyRepository.findById(optionalUser.get().getId());
+                    senderAccountType = AccountType.THIRD_PARTY;
+                    senderId = optionalThirdParty.get().getId();
+                    break;
             }
         }
 
@@ -180,6 +190,15 @@ public class TransactionService implements ITransactionService {
                     AccountType.SAVINGS, savingsOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
             transactionRepository.save(transaction);
         }
+
+        // Case if it's a third party account
+        else if(thirdPartyRepository.findById(accountId).isPresent()) {
+            Optional<ThirdParty> thirdPartyOptionalRecipient = thirdPartyRepository.findById(accountId);
+            // Add the transaction
+            Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, senderId,
+                    AccountType.THIRD_PARTY, thirdPartyOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
+            transactionRepository.save(transaction);
+        }
     }
 
     public boolean recipientExists(String ownerString, Long accountId) {
@@ -190,7 +209,8 @@ public class TransactionService implements ITransactionService {
                 creditCardRepository.findByIdAndPrimaryOwner(accountId, owner).isPresent() ||
                 creditCardRepository.findByIdAndSecondaryOwner(accountId, owner).isPresent() ||
                 savingsRepository.findByIdAndPrimaryOwner(accountId, owner).isPresent() ||
-                savingsRepository.findByIdAndSecondaryOwner(accountId, owner).isPresent()
+                savingsRepository.findByIdAndSecondaryOwner(accountId, owner).isPresent() ||
+                thirdPartyRepository.findById(accountId).isPresent()
         ) result = true;
         return result;
     }

@@ -14,9 +14,10 @@ import javax.persistence.*;
 @AllArgsConstructor
 @PrimaryKeyJoinColumn(name = "id")
 public class ThirdParty extends User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
 
+    private String name;
     private String hashedKey;
 }
