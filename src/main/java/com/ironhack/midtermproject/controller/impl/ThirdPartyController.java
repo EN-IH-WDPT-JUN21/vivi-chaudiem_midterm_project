@@ -33,5 +33,4 @@ public class ThirdPartyController {
     public ThirdParty store(@RequestBody @Valid ThirdParty thirdParty) {
         return thirdPartyRepository.save(thirdParty);
     }
-
 }

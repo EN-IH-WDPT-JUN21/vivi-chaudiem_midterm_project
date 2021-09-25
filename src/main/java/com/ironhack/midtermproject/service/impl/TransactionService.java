@@ -190,15 +190,6 @@ public class TransactionService implements ITransactionService {
                     AccountType.SAVINGS, savingsOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
             transactionRepository.save(transaction);
         }
-
-        // Case if it's a third party account
-        else if(thirdPartyRepository.findById(accountId).isPresent()) {
-            Optional<ThirdParty> thirdPartyOptionalRecipient = thirdPartyRepository.findById(accountId);
-            // Add the transaction
-            Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, senderId,
-                    AccountType.THIRD_PARTY, thirdPartyOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
-            transactionRepository.save(transaction);
-        }
     }
 
     public boolean recipientExists(String ownerString, Long accountId) {
@@ -221,6 +212,69 @@ public class TransactionService implements ITransactionService {
 
     public boolean belowMinimumBalance(BigDecimal balance, BigDecimal minimumBalance) {
         return balance.compareTo(minimumBalance) > 0 ? false : true;
+    }
+
+    public void transferMoneyThirdParty(String hashedKey, String value, Long accountId, String secretKey) {
+        // Transform input values
+        Money valueAsMoney = new Money(BigDecimal.valueOf(Long.parseLong(value)));
+        BigDecimal amount = valueAsMoney.getAmount();
+
+        // Get username from sender
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUser = authentication.getName();
+        Optional<User> optionalUser = userRepository.findByUsername(currentUser);
+        Optional<ThirdParty> optionalThirdPartyUser = thirdPartyRepository.findById(optionalUser.get().getId());
+
+        // Check hashed key
+        String correctHashedKey = optionalThirdPartyUser.get().getHashedKey();
+        if(!correctHashedKey.equals(hashedKey)) return;
+
+        // Determine recipient account and update it
+        // Case if it's a checking account
+        if(checkingRepository.findById(accountId).isPresent()) {
+            Checking recipientChecking = checkingRepository.findById(accountId).get();
+            String correctSecretKey = recipientChecking.getSecretKey();
+            // Check if correct secret key was provided
+            if(correctSecretKey.equals(secretKey)) {
+                BigDecimal recipientBalance = recipientChecking.getBalance().add(amount);
+                checkingService.updateBalance(recipientChecking.getId(), recipientBalance);
+                // Add the transaction
+                Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, AccountType.THIRD_PARTY, optionalThirdPartyUser.get().getId(),
+                        AccountType.CHECKING, recipientChecking.getId(), valueAsMoney, LocalDate.now());
+                transactionRepository.save(transaction);
+            } else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        }
+
+        // Case if it's a savings account
+        if(savingsRepository.findById(accountId).isPresent()) {
+            Savings recipientSavings = savingsRepository.findById(accountId).get();
+            String correctSecretKey = recipientSavings.getSecretKey();
+            // Check if correct secret key was provided
+//            if(correctSecretKey.equals(secretKey)) {
+                BigDecimal recipientBalance = recipientSavings.getBalance().add(amount);
+                savingsService.updateBalance(recipientSavings.getId(), recipientBalance);
+                // Add the transaction
+                Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, AccountType.THIRD_PARTY, optionalThirdPartyUser.get().getId(),
+                        AccountType.SAVINGS, recipientSavings.getId(), valueAsMoney, LocalDate.now());
+                transactionRepository.save(transaction);
+//            } else {
+//                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+//            }
+        }
+
+        // Case if it's a credit card account
+        if(creditCardRepository.findById(accountId).isPresent()) {
+            CreditCard recipientSavings = creditCardRepository.findById(accountId).get();
+            // Update recipient account
+            BigDecimal recipientBalance = recipientSavings.getBalance().add(amount);
+            creditCardService.updateBalance(recipientSavings.getId(), recipientBalance);
+            // Add the transaction
+            Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, AccountType.THIRD_PARTY, optionalThirdPartyUser.get().getId(),
+                    AccountType.CREDITCARD, recipientSavings.getId(), valueAsMoney, LocalDate.now());
+            transactionRepository.save(transaction);
+        }
     }
 
 }

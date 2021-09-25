@@ -47,8 +47,23 @@ public class TransactionController {
         transactionService.transferMoney(accountType, value, owner, accountId);
     }
 
+    @PutMapping(value = "/transfer/third_party", params = {"value", "id", "secretKey"})
+    @ResponseStatus(HttpStatus.OK)
+    public void transferMoneyThirdParty(@RequestHeader String hashedKey, @RequestParam String value, @RequestParam(value = "id") Long accountId, @RequestParam String secretKey) {
+        transactionService.transferMoneyThirdParty(hashedKey, value, accountId, secretKey);
+    }
+
+        /*
+        @GetMapping(value = "/savings", params = {"id", "primaryOwner"})
+    @ResponseStatus(HttpStatus.OK)
+    public Optional<Savings> getSavingsByIdAndPrimaryOwner(@RequestParam long id, @RequestParam String primaryOwner) {
+        Owner owner = new Owner(primaryOwner);
+        return savingsRepository.findByIdAndPrimaryOwner(id, owner);
+    }
+         */
+
     /*
-        String accountType, String value, String primaryOwnerString, String secondaryOwnerString, Long accountId) {
+    transferMoney(String hashedKey, String value, Long accountId, String secretKey) {
 
      */
 
