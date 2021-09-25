@@ -6,6 +6,7 @@ import com.ironhack.midtermproject.dao.LoginData.User;
 import com.ironhack.midtermproject.dao.Money;
 import com.ironhack.midtermproject.dao.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
+import com.ironhack.midtermproject.enums.CheckingType;
 import com.ironhack.midtermproject.enums.TransactionType;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CreditCardRepository;
@@ -80,11 +81,16 @@ public class TransactionService implements ITransactionService {
                     senderId = optionalCheckingSender.get().getId();
                     // Update balance of sender if enough money
                     if(hasEnoughMoney(amount, optionalCheckingSender.get().getBalance())) {
+                        // Check if penalty must be deducted
+                        if(optionalCheckingSender.get().getCheckingType() == CheckingType.STANDARD_CHECKING &&
+                            belowMinimumBalance(senderBalance, optionalCheckingSender.get().getMinimumBalance())) {
+                                senderBalance = senderBalance.subtract(optionalCheckingSender.get().getPenaltyFee());
+                        }
+                        savingsService.updateBalance(senderId, senderBalance);
                         checkingService.updateBalance(senderId, senderBalance);
                     } else {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not enough money!");
                     }
-
                     break;
                 case "CREDITCARD":
                     Optional<CreditCard> optionalCreditCardSender = creditCardRepository.findByAccountHolder(optionalAccountHolder.get());
@@ -105,6 +111,10 @@ public class TransactionService implements ITransactionService {
                     senderId = optionalSavingsSender.get().getId();
                     // Update balance of sender if enough money
                     if(hasEnoughMoney(amount, optionalSavingsSender.get().getBalance())) {
+                        // Check if penalty must be deducted
+                        if(belowMinimumBalance(senderBalance, optionalSavingsSender.get().getMinimumBalance())) {
+                            senderBalance = senderBalance.subtract(optionalSavingsSender.get().getPenaltyFee());
+                        }
                         savingsService.updateBalance(senderId, senderBalance);
                     } else {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not enough money!");
@@ -189,5 +199,8 @@ public class TransactionService implements ITransactionService {
         return amount.compareTo(currentBalance) > 0 ? false : true;
     }
 
+    public boolean belowMinimumBalance(BigDecimal balance, BigDecimal minimumBalance) {
+        return balance.compareTo(minimumBalance) > 0 ? false : true;
+    }
 
 }
