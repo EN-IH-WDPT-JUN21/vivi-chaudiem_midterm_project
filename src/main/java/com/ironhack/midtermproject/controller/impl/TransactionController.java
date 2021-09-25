@@ -40,11 +40,11 @@ public class TransactionController {
         return transactionRepository.findByAccountOneIdAndAccountOneType(accountOneId, AccountType.SAVINGS);
     }
 
-    @PutMapping("/transfer/{accountType}/{value}/{primaryOwner}/{secondaryOwner}/{id}")
+    @PutMapping("/transfer/{accountType}/{value}/{owner}/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void transferMoney(@PathVariable String accountType, @PathVariable String value, @PathVariable String primaryOwner,
-                              @PathVariable String secondaryOwner, @PathVariable(value = "id") Long accountId) {
-        transactionService.transferMoney(accountType, value, primaryOwner, secondaryOwner, accountId);
+    public void transferMoney(@PathVariable String accountType, @PathVariable String value, @PathVariable String owner,
+                              @PathVariable(value = "id") Long accountId) {
+        transactionService.transferMoney(accountType, value, owner, accountId);
     }
 
     /*
