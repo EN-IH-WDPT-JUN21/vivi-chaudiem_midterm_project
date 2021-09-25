@@ -63,49 +63,57 @@ public class TransactionService implements ITransactionService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUser = authentication.getName();
         Optional<User> optionalUser = userRepository.findByUsername(currentUser);
-        Optional<AccountHolder> optionalAccountHolder = accountHolderRepository.findByUserId(optionalUser.get().getId());
+        Optional<AccountHolder> optionalAccountHolder = accountHolderRepository.findById(optionalUser.get().getId());
 
         // Get sender account and its new balance
         BigDecimal senderBalance = null;
         Long senderId = null;
         AccountType senderAccountType = null;
 
-        switch(accountType.toUpperCase()) {
-            case "CHECKING":
-                Optional<Checking> optionalCheckingSender = checkingRepository.findByAccountHolderId(optionalAccountHolder.get().getId());
-                senderBalance = optionalCheckingSender.get().getBalance().subtract(amount);
-                senderAccountType = AccountType.CHECKING;
-                senderId = optionalCheckingSender.get().getId();
-                break;
-            case "CREDITCARD":
-                Optional<CreditCard> optionalCreditCardSender = creditCardRepository.findByAccountHolderId(optionalAccountHolder.get().getId());
-                senderBalance = optionalCreditCardSender.get().getBalance().subtract(amount);
-                senderAccountType = AccountType.CREDITCARD;
-                senderId = optionalCreditCardSender.get().getId();
-                break;
-            case "SAVINGS":
-                Optional<Savings> optionalSavingsSender = savingsRepository.findByAccountHolderId(optionalAccountHolder.get().getId());
-                senderBalance = optionalSavingsSender.get().getBalance().subtract(amount);
-                senderAccountType = AccountType.SAVINGS;
-                senderId = optionalSavingsSender.get().getId();
-                break;
+        if(recipientExists(primaryOwnerString, secondaryOwnerString, accountId)) {
+            switch(accountType.toUpperCase()) {
+                case "CHECKING":
+                    Optional<Checking> optionalCheckingSender = checkingRepository.findByAccountHolder(optionalAccountHolder.get());
+                    senderBalance = optionalCheckingSender.get().getBalance().subtract(amount);
+                    senderAccountType = AccountType.CHECKING;
+                    senderId = optionalCheckingSender.get().getId();
+                    // Update balance of sender
+                    checkingService.updateBalance(senderId, senderBalance);
+                    break;
+                case "CREDITCARD":
+                    Optional<CreditCard> optionalCreditCardSender = creditCardRepository.findByAccountHolder(optionalAccountHolder.get());
+                    senderBalance = optionalCreditCardSender.get().getBalance().subtract(amount);
+                    senderAccountType = AccountType.CREDITCARD;
+                    senderId = optionalCreditCardSender.get().getId();
+                    // Update balance of sender
+                    creditCardService.updateBalance(senderId, senderBalance);
+                    break;
+                case "SAVINGS":
+                    Optional<Savings> optionalSavingsSender = savingsRepository.findByAccountHolder(optionalAccountHolder.get());
+                    senderBalance = optionalSavingsSender.get().getBalance().subtract(amount);
+                    senderAccountType = AccountType.SAVINGS;
+                    senderId = optionalSavingsSender.get().getId();
+                    // Update balance of sender
+                    savingsService.updateBalance(senderId, senderBalance);
+                    break;
+            }
         }
+
 
         // Get recipient account by verifying all possibilities and its new balance
-        BigDecimal recipientBalance = null;
+        BigDecimal recipientBalance;
 
         // Case if it's a checking account
-        Optional<Checking> checkingOptionalRecipient = null;
-        checkingOptionalRecipient = checkingRepository.findByIdAndPrimaryOwner(accountId, primaryOwner);
-        if(!checkingOptionalRecipient.isPresent()) {
-            checkingOptionalRecipient = checkingRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner);
-        }
-        if(!checkingOptionalRecipient.isPresent()) {
-            return;
-        } else {
+        if(checkingRepository.findByIdAndPrimaryOwner(accountId, primaryOwner).isPresent() ||
+        checkingRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner).isPresent()) {
+            // Assign the checking optional to a variable
+            Optional<Checking> checkingOptionalRecipient = null;
+            checkingOptionalRecipient = checkingRepository.findByIdAndPrimaryOwner(accountId, primaryOwner);
+            if(!checkingOptionalRecipient.isPresent()) {
+                checkingOptionalRecipient = checkingRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner);
+            }
+            // Calculate new balance of the recipient and update it
             recipientBalance = checkingOptionalRecipient.get().getBalance().add(amount);
-            // Update both accounts
-            checkingService.updateBalance(senderId, senderBalance);
             checkingService.updateBalance(checkingOptionalRecipient.get().getId(), recipientBalance);
             // Add the transaction
             Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, senderId,
@@ -113,25 +121,55 @@ public class TransactionService implements ITransactionService {
             transactionRepository.save(transaction);
         }
 
-        // Case if it's a creditcard account
-        Optional<CreditCard> creditCardOptionalRecipient = null;
-        creditCardOptionalRecipient = creditCardRepository.findByIdAndPrimaryOwner(accountId, primaryOwner);
-        if(!creditCardOptionalRecipient.isPresent()) {
-            creditCardOptionalRecipient = creditCardRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner);
-        }
-        if(!creditCardOptionalRecipient.isPresent()) {
-            return;
-        } else {
+        // Case if it's a credit card account
+        else if(creditCardRepository.findByIdAndPrimaryOwner(accountId, primaryOwner).isPresent() ||
+                creditCardRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner).isPresent()) {
+            // Assign the credit card optional to a variable
+            Optional<CreditCard> creditCardOptionalRecipient = null;
+            creditCardOptionalRecipient = creditCardRepository.findByIdAndPrimaryOwner(accountId, primaryOwner);
+            if(!creditCardOptionalRecipient.isPresent()) {
+                creditCardOptionalRecipient = creditCardRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner);
+            }
+            // Calculate new balance of the recipient and update it
             recipientBalance = creditCardOptionalRecipient.get().getBalance().add(amount);
-            // Update both accounts
-            creditCardService.updateBalance(senderId, senderBalance);
             creditCardService.updateBalance(creditCardOptionalRecipient.get().getId(), recipientBalance);
             // Add the transaction
             Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, senderId,
-                    AccountType.CHECKING, creditCardOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
+                    AccountType.CREDITCARD, creditCardOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
             transactionRepository.save(transaction);
         }
 
+        // Case if it's a savings account
+        else if(savingsRepository.findByIdAndPrimaryOwner(accountId, primaryOwner).isPresent() ||
+                savingsRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner).isPresent()) {
+            // Assign the savings optional to a variable
+            Optional<Savings> savingsOptionalRecipient = null;
+            savingsOptionalRecipient = savingsRepository.findByIdAndPrimaryOwner(accountId, primaryOwner);
+            if(!savingsOptionalRecipient.isPresent()) {
+                savingsOptionalRecipient = savingsRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner);
+            }
+            // Calculate new balance of the recipient and update it
+            recipientBalance = savingsOptionalRecipient.get().getBalance().add(amount);
+            savingsService.updateBalance(savingsOptionalRecipient.get().getId(), recipientBalance);
+            // Add the transaction
+            Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, senderId,
+                    AccountType.SAVINGS, savingsOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
+            transactionRepository.save(transaction);
+        }
+    }
+
+    public boolean recipientExists(String primaryOwnerString, String secondaryOwnerString, Long accountId) {
+        Owner primaryOwner = new Owner(primaryOwnerString);
+        Owner secondaryOwner = new Owner(secondaryOwnerString);
+        boolean result = false;
+        if(checkingRepository.findByIdAndPrimaryOwner(accountId, primaryOwner).isPresent() ||
+                checkingRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner).isPresent() ||
+                creditCardRepository.findByIdAndPrimaryOwner(accountId, primaryOwner).isPresent() ||
+                creditCardRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner).isPresent() ||
+                savingsRepository.findByIdAndPrimaryOwner(accountId, primaryOwner).isPresent() ||
+                savingsRepository.findByIdAndSecondaryOwner(accountId, secondaryOwner).isPresent()
+        ) result = true;
+        return result;
     }
 
 //    public void transferMoney(String value, String senderAccount, Long senderAccountId, String recipientAccount, Long recipientAccountId) {

@@ -40,6 +40,18 @@ public class TransactionController {
         return transactionRepository.findByAccountOneIdAndAccountOneType(accountOneId, AccountType.SAVINGS);
     }
 
+    @PutMapping("/transfer/{accountType}/{value}/{primaryOwner}/{secondaryOwner}/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void transferMoney(@PathVariable String accountType, @PathVariable String value, @PathVariable String primaryOwner,
+                              @PathVariable String secondaryOwner, @PathVariable(value = "id") Long accountId) {
+        transactionService.transferMoney(accountType, value, primaryOwner, secondaryOwner, accountId);
+    }
+
+    /*
+        String accountType, String value, String primaryOwnerString, String secondaryOwnerString, Long accountId) {
+
+     */
+
 //    @PutMapping("/transfer/{value}/{sender}/{senderId}/{recipient}/{recipientId}")
 //    @ResponseStatus(HttpStatus.OK)
 //    public void transferMoney(@PathVariable String value, @PathVariable(value = "sender") String senderAccountType, @PathVariable(value = "senderId") Long senderAccountId,
