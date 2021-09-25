@@ -1,5 +1,6 @@
 package com.ironhack.midtermproject.controller.impl;
 
+import com.ironhack.midtermproject.controller.dto.BalanceDTO;
 import com.ironhack.midtermproject.controller.interfaces.ISavingsController;
 import com.ironhack.midtermproject.dao.AccountData.Owner;
 import com.ironhack.midtermproject.dao.AccountData.Savings;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,10 +49,10 @@ public class SavingsController implements ISavingsController {
         savingsService.addInterest(id);
     }
 
-    @PutMapping("/modify/savings/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid Savings savings) {
-        savingsService.update(id, savings);
+    @PatchMapping("/modify/savings/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid BalanceDTO balanceDTO) {
+        savingsService.updateBalance(id, balanceDTO.getBalance());
     }
 
     @GetMapping(value = "/savings", params = {"id", "primaryOwner"})

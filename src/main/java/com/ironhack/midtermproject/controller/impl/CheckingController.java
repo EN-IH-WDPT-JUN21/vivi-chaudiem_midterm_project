@@ -1,5 +1,6 @@
 package com.ironhack.midtermproject.controller.impl;
 
+import com.ironhack.midtermproject.controller.dto.BalanceDTO;
 import com.ironhack.midtermproject.controller.interfaces.ICheckingController;
 import com.ironhack.midtermproject.dao.AccountData.Checking;
 import com.ironhack.midtermproject.dao.AccountData.Owner;
@@ -41,11 +42,12 @@ public class CheckingController implements ICheckingController {
         return checkingService.store(checking);
     }
 
-    @PutMapping("/modify/checking/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid Checking checking) {
-        checkingService.update(id, checking);
+    @PatchMapping("/modify/checking/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid BalanceDTO balanceDTO) {
+        checkingService.updateBalance(id, balanceDTO.getBalance());
     }
+
 
     @GetMapping(value = "/checking", params = {"id", "primaryOwner"})
     @ResponseStatus(HttpStatus.OK)

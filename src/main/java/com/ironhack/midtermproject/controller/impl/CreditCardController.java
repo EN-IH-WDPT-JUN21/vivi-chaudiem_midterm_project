@@ -1,5 +1,6 @@
 package com.ironhack.midtermproject.controller.impl;
 
+import com.ironhack.midtermproject.controller.dto.BalanceDTO;
 import com.ironhack.midtermproject.controller.interfaces.ICreditCardController;
 import com.ironhack.midtermproject.dao.AccountData.CreditCard;
 import com.ironhack.midtermproject.dao.AccountData.Owner;
@@ -47,10 +48,10 @@ public class CreditCardController implements ICreditCardController {
         creditCardService.addInterest(id);
     }
 
-    @PutMapping("/modify/creditcard/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid CreditCard creditCard) {
-        creditCardService.update(id, creditCard);
+    @PatchMapping("/modify/creditcard/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@PathVariable(name = "id") Long id, @RequestBody @Valid BalanceDTO balanceDTO) {
+        creditCardService.updateBalance(id, balanceDTO.getBalance());
     }
 
     @GetMapping(value = "/creditcard", params = {"id", "primaryOwner"})

@@ -15,9 +15,11 @@ import com.ironhack.midtermproject.repository.LoginDataRepositories.UserReposito
 import com.ironhack.midtermproject.repository.TransactionRepository;
 import com.ironhack.midtermproject.service.interfaces.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -76,24 +78,37 @@ public class TransactionService implements ITransactionService {
                     senderBalance = optionalCheckingSender.get().getBalance().subtract(amount);
                     senderAccountType = AccountType.CHECKING;
                     senderId = optionalCheckingSender.get().getId();
-                    // Update balance of sender
-                    checkingService.updateBalance(senderId, senderBalance);
+                    // Update balance of sender if enough money
+                    if(hasEnoughMoney(amount, optionalCheckingSender.get().getBalance())) {
+                        checkingService.updateBalance(senderId, senderBalance);
+                    } else {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not enough money!");
+                    }
+
                     break;
                 case "CREDITCARD":
                     Optional<CreditCard> optionalCreditCardSender = creditCardRepository.findByAccountHolder(optionalAccountHolder.get());
                     senderBalance = optionalCreditCardSender.get().getBalance().subtract(amount);
                     senderAccountType = AccountType.CREDITCARD;
                     senderId = optionalCreditCardSender.get().getId();
-                    // Update balance of sender
-                    creditCardService.updateBalance(senderId, senderBalance);
+                    // Update balance of sender if enough money
+                    if(hasEnoughMoney(amount, optionalCreditCardSender.get().getBalance())) {
+                        creditCardService.updateBalance(senderId, senderBalance);
+                    } else {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not enough money!");
+                    }
                     break;
                 case "SAVINGS":
                     Optional<Savings> optionalSavingsSender = savingsRepository.findByAccountHolder(optionalAccountHolder.get());
                     senderBalance = optionalSavingsSender.get().getBalance().subtract(amount);
                     senderAccountType = AccountType.SAVINGS;
                     senderId = optionalSavingsSender.get().getId();
-                    // Update balance of sender
-                    savingsService.updateBalance(senderId, senderBalance);
+                    // Update balance of sender if enough money
+                    if(hasEnoughMoney(amount, optionalSavingsSender.get().getBalance())) {
+                        savingsService.updateBalance(senderId, senderBalance);
+                    } else {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not enough money!");
+                    }
                     break;
             }
         }
@@ -170,101 +185,9 @@ public class TransactionService implements ITransactionService {
         return result;
     }
 
-//    public void transferMoney(String value, String senderAccount, Long senderAccountId, String recipientAccount, Long recipientAccountId) {
-//        Account sender = null;
-//        Account recipient = null;
-//        AccountType senderAccountType = null;
-//        AccountType recipientAccountType = null;
-//        BigDecimal minimumBalanceSender = null;
-//        BigDecimal minimumBalanceRecipient = null;
-//
-//        // Determine the specific sender account
-//        switch(senderAccount.toUpperCase()) {
-//            case "CHECKING":
-//                Optional<Checking> checkingOptional = checkingRepository.findById(senderAccountId);
-//                if(checkingOptional.isPresent()) {
-//                    sender = checkingOptional.get();
-//                    senderAccountType = AccountType.CHECKING;
-//                }
-//                break;
-//
-//            case "SAVINGS":
-//                Optional<Savings> savingsOptional = savingsRepository.findById(senderAccountId);
-//                if(savingsOptional.isPresent()) {
-//                    sender = savingsOptional.get();
-//                    senderAccountType = AccountType.SAVINGS;
-//                }
-//                break;
-//
-//            case "CREDITCARD":
-//                Optional<CreditCard> creditCardOptional = creditCardRepository.findById(senderAccountId);
-//                if(creditCardOptional.isPresent()) {
-//                    sender = creditCardOptional.get();
-//                    senderAccountType = AccountType.CREDITCARD;
-//                }
-//                break;
-//        }
-//
-//        // Determine the specific recipient account
-//        switch(recipientAccount.toUpperCase()) {
-//            case "CHECKING":
-//                Optional<Checking> checkingOptional = checkingRepository.findById(recipientAccountId);
-//                if(checkingOptional.isPresent()) {
-//                    recipient = checkingOptional.get();
-//                    recipientAccountType = AccountType.CHECKING;
-//                }
-//                break;
-//
-//            case "SAVINGS":
-//                Optional<Savings> savingsOptional = savingsRepository.findById(recipientAccountId);
-//                if(savingsOptional.isPresent()) {
-//                    recipient = savingsOptional.get();
-//                    recipientAccountType = AccountType.SAVINGS;
-//                }
-//                break;
-//
-//            case "CREDITCARD":
-//                Optional<CreditCard> creditCardOptional = creditCardRepository.findById(recipientAccountId);
-//                if(creditCardOptional.isPresent()) {
-//                    recipient = creditCardOptional.get();
-//                    recipientAccountType = AccountType.CREDITCARD;
-//                }
-//                break;
-//        }
-//
-//        // Calculate new balances
-//        Money valueAsMoney = new Money(BigDecimal.valueOf(Long.parseLong(value)));
-//        BigDecimal amount = valueAsMoney.getAmount();
-//        BigDecimal senderBalance = sender.getBalance().subtract(amount);
-//
-//        BigDecimal recipientBalance = recipient.getBalance().add(amount);
-//
-//        // Update the balances
-//        switch(senderAccountType) {
-//            case CHECKING:
-//                checkingService.updateBalance(sender.getId(), senderBalance);
-//                break;
-//            case SAVINGS:
-//                savingsService.updateBalance(sender.getId(), senderBalance);
-//                break;
-//            case CREDITCARD:
-//                creditCardService.updateBalance(sender.getId(), senderBalance);
-//                break;
-//        }
-//
-//        switch(recipientAccountType) {
-//            case CHECKING:
-//                checkingService.updateBalance(recipient.getId(), recipientBalance);
-//                break;
-//            case SAVINGS:
-//                savingsService.updateBalance(recipient.getId(), recipientBalance);
-//                break;
-//            case CREDITCARD:
-//                creditCardService.updateBalance(recipient.getId(), recipientBalance);
-//                break;
-//        }
-//
-//        Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, sender.getId(), recipientAccountType, recipient.getId(), valueAsMoney, LocalDate.now());
-//        transactionRepository.save(transaction);
-//    }
+    public boolean hasEnoughMoney(BigDecimal amount, BigDecimal currentBalance) {
+        return amount.compareTo(currentBalance) > 0 ? false : true;
+    }
+
+
 }
