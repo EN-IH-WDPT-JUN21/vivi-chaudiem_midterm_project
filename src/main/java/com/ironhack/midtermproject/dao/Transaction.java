@@ -1,15 +1,18 @@
 package com.ironhack.midtermproject.dao;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -41,9 +44,10 @@ public class Transaction {
     @Embedded
     private Money value;
 
-    private LocalDate transactionDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime transactionDate;
 
-    public Transaction(TransactionType transactionType, AccountType accountOneType, Long accountOneId, AccountType accountTwoType, Long accountTwoId, Money value, LocalDate transactionDate) {
+    public Transaction(TransactionType transactionType, AccountType accountOneType, Long accountOneId, AccountType accountTwoType, Long accountTwoId, Money value, LocalDateTime transactionDate) {
         this.transactionType = transactionType;
         this.accountOneType = accountOneType;
         this.accountOneId = accountOneId;

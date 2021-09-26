@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public class CreditCardService implements ICreditCardService {
         boolean interestAddedOneMonthOrLonger = interestAddedOneMonthOrLonger(id);
 
         // Add interest rate if it has been 1 month or longer since Account creation and if the account has never gotten any interest rate
-        int timeDifference = calculateTimeDifference(creditCard.getCreationDate(), LocalDate.now());
+        int timeDifference = calculateTimeDifference(creditCard.getCreationDate(), LocalDateTime.now());
         boolean hasNeverGottenAnyInterest = hasNeverGottenAnyInterest(id);
 
         if(interestAddedOneMonthOrLonger || (timeDifference > 30 && hasNeverGottenAnyInterest)) {
@@ -51,7 +52,7 @@ public class CreditCardService implements ICreditCardService {
             creditCardRepository.save(creditCard);
 
             Money newBalanceMoney = new Money(interestValue);
-            Transaction transaction = new Transaction(TransactionType.INTEREST, AccountType.CREDITCARD, creditCard.getId(), null, null, newBalanceMoney, LocalDate.now());
+            Transaction transaction = new Transaction(TransactionType.INTEREST, AccountType.CREDITCARD, creditCard.getId(), null, null, newBalanceMoney, LocalDateTime.now());
             transactionRepository.save(transaction);
         }
 
@@ -61,7 +62,7 @@ public class CreditCardService implements ICreditCardService {
         List<Transaction> transactionList = transactionRepository.findByAccountOneIdAndAccountOneType(id, AccountType.CREDITCARD);
         for(Transaction transaction : transactionList) {
             if(transaction.getTransactionType() == TransactionType.INTEREST && transaction.getAccountOneType() == AccountType.CREDITCARD) {
-                int timeDifference = calculateTimeDifference(transaction.getTransactionDate(), LocalDate.now());
+                int timeDifference = calculateTimeDifference(transaction.getTransactionDate(), LocalDateTime.now());
                 if(timeDifference > 30) return true;
             }
         }

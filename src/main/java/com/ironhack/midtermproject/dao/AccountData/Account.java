@@ -1,5 +1,6 @@
 package com.ironhack.midtermproject.dao.AccountData;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @MappedSuperclass
 @Getter
@@ -40,8 +42,8 @@ public class Account {
     @Embedded
     private Owner secondaryOwner;
 
-    @DateTimeFormat(pattern = "yyy-MM-dd")
-    private LocalDate creationDate = LocalDate.now();
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime creationDate = LocalDateTime.now();
 }
 
 /*

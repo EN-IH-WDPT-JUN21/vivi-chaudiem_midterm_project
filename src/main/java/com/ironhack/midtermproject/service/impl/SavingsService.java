@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +44,7 @@ public class SavingsService implements ISavingsService {
         boolean interestAddedOneYearOrLonger = interestAddedOneYearOrLonger(id);
 
         // Add interest rate if it has been 1 year or longer since Account creation and if the account has never gotten any interest rate
-        int timeDifference = calculateTimeDifference(savings.getCreationDate(), LocalDate.now());
+        int timeDifference = calculateTimeDifference(savings.getCreationDate(), LocalDateTime.now());
         boolean hasNeverGottenAnyInterest = hasNeverGottenAnyInterest(id);
 
         if(interestAddedOneYearOrLonger || (timeDifference > 365 && hasNeverGottenAnyInterest)) {
@@ -57,7 +58,7 @@ public class SavingsService implements ISavingsService {
             savingsRepository.save(savings);
 
             Money newBalanceMoney = new Money(interestValue);
-            Transaction transaction = new Transaction(TransactionType.INTEREST, AccountType.SAVINGS, savings.getId(), null, null, newBalanceMoney, LocalDate.now());
+            Transaction transaction = new Transaction(TransactionType.INTEREST, AccountType.SAVINGS, savings.getId(), null, null, newBalanceMoney, LocalDateTime.now());
             transactionRepository.save(transaction);
         }
 
@@ -67,14 +68,14 @@ public class SavingsService implements ISavingsService {
         List<Transaction> transactionList = transactionRepository.findByAccountOneIdAndAccountOneType(id, AccountType.SAVINGS);
         for(Transaction transaction : transactionList) {
             if(transaction.getTransactionType() == TransactionType.INTEREST && transaction.getAccountOneType() == AccountType.SAVINGS) {
-                int timeDifference = calculateTimeDifference(transaction.getTransactionDate(), LocalDate.now());
+                int timeDifference = calculateTimeDifference(transaction.getTransactionDate(), LocalDateTime.now());
                 if(timeDifference > 365) return true;
             }
         }
         return false;
     }
 
-    public static int calculateTimeDifference(LocalDate date, LocalDate currentDate) {
+    public static int calculateTimeDifference(LocalDateTime date, LocalDateTime currentDate) {
         if(date != null && currentDate != null) {
             return (int) DAYS.between(date, currentDate);
         } else {

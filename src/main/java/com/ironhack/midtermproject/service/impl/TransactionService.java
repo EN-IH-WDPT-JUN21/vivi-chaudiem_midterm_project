@@ -8,6 +8,7 @@ import com.ironhack.midtermproject.dao.Money;
 import com.ironhack.midtermproject.dao.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.enums.CheckingType;
+import com.ironhack.midtermproject.enums.Status;
 import com.ironhack.midtermproject.enums.TransactionType;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CreditCardRepository;
@@ -26,7 +27,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class TransactionService implements ITransactionService {
@@ -151,8 +156,10 @@ public class TransactionService implements ITransactionService {
             checkingService.updateBalance(checkingOptionalRecipient.get().getId(), recipientBalance);
             // Add the transaction
             Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, senderId,
-                    AccountType.CHECKING, checkingOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
+                    AccountType.CHECKING, checkingOptionalRecipient.get().getId(), valueAsMoney, LocalDateTime.now());
             transactionRepository.save(transaction);
+            // Fraud detection
+            fraudDetection(checkingOptionalRecipient.get().getId(), AccountType.CHECKING);
         }
 
         // Case if it's a credit card account
@@ -169,7 +176,7 @@ public class TransactionService implements ITransactionService {
             creditCardService.updateBalance(creditCardOptionalRecipient.get().getId(), recipientBalance);
             // Add the transaction
             Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, senderId,
-                    AccountType.CREDITCARD, creditCardOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
+                    AccountType.CREDITCARD, creditCardOptionalRecipient.get().getId(), valueAsMoney, LocalDateTime.now());
             transactionRepository.save(transaction);
         }
 
@@ -177,7 +184,7 @@ public class TransactionService implements ITransactionService {
         else if(savingsRepository.findByIdAndPrimaryOwner(accountId, owner).isPresent() ||
                 savingsRepository.findByIdAndSecondaryOwner(accountId, owner).isPresent()) {
             // Assign the savings optional to a variable
-            Optional<Savings> savingsOptionalRecipient = null;
+            Optional<Savings> savingsOptionalRecipient;
             savingsOptionalRecipient = savingsRepository.findByIdAndPrimaryOwner(accountId, owner);
             if(!savingsOptionalRecipient.isPresent()) {
                 savingsOptionalRecipient = savingsRepository.findByIdAndSecondaryOwner(accountId, owner);
@@ -187,9 +194,13 @@ public class TransactionService implements ITransactionService {
             savingsService.updateBalance(savingsOptionalRecipient.get().getId(), recipientBalance);
             // Add the transaction
             Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, senderId,
-                    AccountType.SAVINGS, savingsOptionalRecipient.get().getId(), valueAsMoney, LocalDate.now());
+                    AccountType.SAVINGS, savingsOptionalRecipient.get().getId(), valueAsMoney, LocalDateTime.now());
             transactionRepository.save(transaction);
+            // Fraud detection
+            fraudDetection(savingsOptionalRecipient.get().getId(), AccountType.SAVINGS);
         }
+
+        fraudDetection(senderId, senderAccountType);
     }
 
     public boolean recipientExists(String ownerString, Long accountId) {
@@ -240,7 +251,7 @@ public class TransactionService implements ITransactionService {
                 checkingService.updateBalance(recipientChecking.getId(), recipientBalance);
                 // Add the transaction
                 Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, AccountType.THIRD_PARTY, optionalThirdPartyUser.get().getId(),
-                        AccountType.CHECKING, recipientChecking.getId(), valueAsMoney, LocalDate.now());
+                        AccountType.CHECKING, recipientChecking.getId(), valueAsMoney, LocalDateTime.now());
                 transactionRepository.save(transaction);
             } else {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -252,16 +263,16 @@ public class TransactionService implements ITransactionService {
             Savings recipientSavings = savingsRepository.findById(accountId).get();
             String correctSecretKey = recipientSavings.getSecretKey();
             // Check if correct secret key was provided
-//            if(correctSecretKey.equals(secretKey)) {
+            if(correctSecretKey.equals(secretKey)) {
                 BigDecimal recipientBalance = recipientSavings.getBalance().add(amount);
                 savingsService.updateBalance(recipientSavings.getId(), recipientBalance);
                 // Add the transaction
                 Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, AccountType.THIRD_PARTY, optionalThirdPartyUser.get().getId(),
-                        AccountType.SAVINGS, recipientSavings.getId(), valueAsMoney, LocalDate.now());
+                        AccountType.SAVINGS, recipientSavings.getId(), valueAsMoney, LocalDateTime.now());
                 transactionRepository.save(transaction);
-//            } else {
-//                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-//            }
+            } else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
         }
 
         // Case if it's a credit card account
@@ -272,9 +283,48 @@ public class TransactionService implements ITransactionService {
             creditCardService.updateBalance(recipientSavings.getId(), recipientBalance);
             // Add the transaction
             Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, AccountType.THIRD_PARTY, optionalThirdPartyUser.get().getId(),
-                    AccountType.CREDITCARD, recipientSavings.getId(), valueAsMoney, LocalDate.now());
+                    AccountType.CREDITCARD, recipientSavings.getId(), valueAsMoney, LocalDateTime.now());
             transactionRepository.save(transaction);
         }
+    }
+
+    public void fraudDetection(Long accountId, AccountType accountType) {
+        // Fraud, if transactions made in 24 hours total to more than 150% of the customers highest daily total transactions in any other 24 hour period.
+        boolean higherTransaction = false;
+        Optional<Double> highestDailyTotalOptional = transactionRepository.findMaxAmount(String.valueOf(accountId));
+        if(highestDailyTotalOptional.isPresent()) {
+            double highestDailyTotal = highestDailyTotalOptional.get();
+            double transactionsCurrentDay = transactionRepository.findTotalToday(String.valueOf(accountId));
+            double limit = highestDailyTotal*1.5;
+            if(transactionsCurrentDay > limit) higherTransaction = true;
+        }
+
+        // Fraud, if more than 2 transactions occurring on a single account within a 1 second period.
+        List<Transaction> transactionList = transactionRepository.findAllTransactionsFromId(String.valueOf(accountId));
+        boolean hasMoreThanTwoTransactionsPerSecond = hasMoreThanTwoTransactionsPerSecond(transactionList);
+
+        // Freeze account if any of these occurs
+        if(higherTransaction || hasMoreThanTwoTransactionsPerSecond) {
+            switch(accountType) {
+                case CHECKING:
+                    Optional<Checking> checkingOptional = checkingRepository.findById(accountId);
+                    if(checkingOptional.isPresent()) checkingOptional.get().setStatus(Status.FROZEN);
+                    break;
+                case SAVINGS:
+                    Optional<Savings> savingsOptional = savingsRepository.findById(accountId);
+                    if(savingsOptional.isPresent()) savingsOptional.get().setStatus(Status.FROZEN);
+                    break;
+            }
+        }
+    }
+
+    public boolean hasMoreThanTwoTransactionsPerSecond(List<Transaction> transactionList) {
+        for(Transaction transaction : transactionList) {
+            LocalDateTime transactionDate = transaction.getTransactionDate();
+            List<Transaction> findings = transactionRepository.findAllTransactionsFromTime(transactionDate);
+            if(findings.size() > 1) return true;
+        }
+        return false;
     }
 
 }
