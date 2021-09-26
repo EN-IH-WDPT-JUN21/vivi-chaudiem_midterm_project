@@ -21,7 +21,7 @@ import static com.ironhack.midtermproject.utils.PasswordUtil.encryptedPassword;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     private String username;
@@ -38,5 +38,9 @@ public class User {
         this.password = encryptedPassword(password);
     }
 
-
+    public User(String username, String password, Role role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
 }

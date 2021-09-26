@@ -18,6 +18,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -32,7 +33,8 @@ public class Savings extends Account {
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, optional = false)
+//    @OneToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_holder_id")
     private AccountHolder accountHolder;
 
@@ -53,4 +55,13 @@ public class Savings extends Account {
 
     // How to add: per Year, check if exists 1 year or when it got interest the last time 1 year ago
 
+
+    public Savings(BigDecimal balance, Owner primaryOwner, Owner secondaryOwner, LocalDateTime creationDate, AccountHolder accountHolder, String secretKey, Status status, BigDecimal minimumBalance, BigDecimal interestRate) {
+        super(balance, primaryOwner, secondaryOwner, creationDate);
+        this.accountHolder = accountHolder;
+        this.secretKey = secretKey;
+        this.status = status;
+        this.minimumBalance = minimumBalance;
+        this.interestRate = interestRate;
+    }
 }

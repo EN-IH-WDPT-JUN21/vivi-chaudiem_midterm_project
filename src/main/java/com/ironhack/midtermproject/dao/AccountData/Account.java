@@ -44,6 +44,13 @@ public class Account {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime creationDate = LocalDateTime.now();
+
+    public Account(BigDecimal balance, Owner primaryOwner, Owner secondaryOwner, LocalDateTime creationDate) {
+        this.balance = balance;
+        this.primaryOwner = primaryOwner;
+        this.secondaryOwner = secondaryOwner;
+        this.creationDate = creationDate;
+    }
 }
 
 /*

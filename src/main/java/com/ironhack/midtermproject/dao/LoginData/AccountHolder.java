@@ -50,15 +50,22 @@ public class AccountHolder extends User {
     @Embedded
     private Address mailingAddress;
 
-    @OneToOne(mappedBy = "accountHolder")
+    @OneToOne(mappedBy = "accountHolder", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Savings savings;
 
-    @OneToOne(mappedBy = "accountHolder")
+    @OneToOne(mappedBy = "accountHolder", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private CreditCard creditCard;
 
-    @OneToOne(mappedBy = "accountHolder")
+    @OneToOne(mappedBy = "accountHolder", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Checking checking;
+
+    public AccountHolder(String username, String password, Role role, LocalDate dateOfBirth, Address primaryAddress, Address mailingAddress) {
+        super(username, password, role);
+        this.dateOfBirth = dateOfBirth;
+        this.primaryAddress = primaryAddress;
+        this.mailingAddress = mailingAddress;
+    }
 }
