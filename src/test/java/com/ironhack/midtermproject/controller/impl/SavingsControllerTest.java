@@ -42,6 +42,7 @@ class SavingsControllerTest {
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private Savings savings;
 
     @BeforeEach
     void setUp() {
@@ -52,22 +53,28 @@ class SavingsControllerTest {
         Address primaryAddress = new Address("Street address", "12345", "Berlin");
         AccountHolder accountHolderOne = new AccountHolder("jane", "password123", role, dateOfBirth, primaryAddress,
                 null);
-        AccountHolder accountHolderTwo = new AccountHolder("john", "password123", role, dateOfBirth, primaryAddress,
-                null);
-        List<AccountHolder> accountHolders = accountHolderRepository.saveAll(List.of(accountHolderOne, accountHolderTwo));
+//        AccountHolder accountHolderTwo = new AccountHolder("john", "password123", role, dateOfBirth, primaryAddress,
+//                null);
+//        List<AccountHolder> accountHolders = accountHolderRepository.saveAll(List.of(accountHolderOne));
+        accountHolderRepository.save(accountHolderOne);
 
         Owner primaryOwnerOne = new Owner("Jane");
         Owner primaryOwnerTwo = new Owner("John");
         LocalDateTime creationDate = LocalDateTime.now();
 
-        List<Savings> savings = savingsRepository.saveAll(List.of(
-                new Savings(BigDecimal.valueOf(100), primaryOwnerOne, null,
-                        creationDate, accountHolderOne, "secretkey123", Status.ACTIVE,
-                        BigDecimal.valueOf(1000), BigDecimal.valueOf(0.0025))
+        savings = new Savings(BigDecimal.valueOf(100), primaryOwnerOne, null,
+                creationDate, accountHolderOne, "secretkey123", Status.ACTIVE,
+                BigDecimal.valueOf(1000), BigDecimal.valueOf(0.0025));
+        savingsRepository.save(savings);
+
+//        List<Savings> savingsList = savingsRepository.saveAll(List.of(
+//                new Savings(BigDecimal.valueOf(100), primaryOwnerOne, null,
+//                        creationDate, accountHolderOne, "secretkey123", Status.ACTIVE,
+//                        BigDecimal.valueOf(1000), BigDecimal.valueOf(0.0025))
 //                new Savings(BigDecimal.valueOf(200), primaryOwnerTwo, null,
 //                        creationDate, accountHolderTwo, "secretkey123", Status.ACTIVE,
 //                        BigDecimal.valueOf(1000), BigDecimal.valueOf(0.0025))
-        ));
+//        ));
     }
 
     @AfterEach
@@ -83,19 +90,11 @@ class SavingsControllerTest {
 //        assertTrue(result.getResponse().getContentAsString().contains("John"));
     }
 
-
-    /*
     @Test
-    void findAll_withRegisters_listOfRegisters() throws Exception {
-        MvcResult result = mockMvc.perform(get("/doctors")).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("Alonso Flores"));
-        assertTrue(result.getResponse().getContentAsString().contains("German Ruiz"));
-        assertTrue(result.getResponse().getContentAsString().contains("Paolo Rodriguez"));
-    }
-     */
-
-    @Test
-    void findById() {
+    void findByAccountId() throws Exception {
+        long id = savings.getId();
+        MvcResult result = mockMvc.perform(get("/savings/" + id)).andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("Jane"));
     }
 
     @Test
