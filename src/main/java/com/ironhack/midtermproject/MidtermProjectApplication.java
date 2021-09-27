@@ -1,5 +1,7 @@
 package com.ironhack.midtermproject;
 
+import com.ironhack.midtermproject.dao.LoginData.Admin;
+import com.ironhack.midtermproject.dao.LoginData.Role;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

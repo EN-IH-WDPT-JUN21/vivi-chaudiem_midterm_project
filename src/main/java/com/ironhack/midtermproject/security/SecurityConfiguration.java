@@ -23,6 +23,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+//
+//    @Autowired
+//    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+//        auth
+//                .inMemoryAuthentication()
+//                .withUser("admin").password("admin123").roles("ADMIN");
+//    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
@@ -34,10 +41,27 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.httpBasic();
-        http.csrf().disable();
+//        http.csrf().disable();
         http.authorizeRequests()
-//                .mvcMatchers(HttpMethod.GET, "/savings").hasRole("ACCOUNT_HOLDER")
-                .mvcMatchers(HttpMethod.PUT, "/transfer/{accountType}/{value}/{primaryOwner}/{secondaryOwner}/{id}").hasRole("ACCOUNT_HOLDER")
+                .mvcMatchers(HttpMethod.GET, "/savings/{id}").hasRole("ACCOUNT_HOLDER")
+                .mvcMatchers(HttpMethod.GET, "/creditcard/{id}").hasRole("ACCOUNT_HOLDER")
+                .mvcMatchers(HttpMethod.GET, "/checking/{id}").hasRole("ACCOUNT_HOLDER")
+                .mvcMatchers(HttpMethod.GET, "/third_party/{id}").hasRole("THIRD_PARTY")
+                .mvcMatchers(HttpMethod.GET, "/transactions/{id}").hasRole("ACCOUNT_HOLDER, THIRD_PARTY")
+                .mvcMatchers(HttpMethod.GET, "/transactions/savings/{id}").hasRole("ACCOUNT_HOLDER")
+                .mvcMatchers(HttpMethod.GET, "/transfer/third_party").hasRole("ACCOUNT_HOLDER")
+                .mvcMatchers(HttpMethod.PUT, "/transfer/{accountType}/{value}/{owner}/{id}").hasRole("ACCOUNT_HOLDER")
+//                .mvcMatchers(HttpMethod.GET, "/savings").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.GET, "/creditcard").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.GET, "/checking").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.GET, "/transactions").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.GET, "/create/savings").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.GET, "/create/creditcard").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.GET, "/create/checking").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.GET, "/create/third_party").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.PATCH, "/modify/savings/{id}").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.PATCH, "/modify/creditcard/{id}").hasRole("ADMIN")
+//                .mvcMatchers(HttpMethod.PATCH, "/modify/checking/{id}").hasRole("ADMIN")
                 .anyRequest().permitAll();
     }
 }

@@ -53,26 +53,4 @@ public class Account {
     }
 }
 
-/*
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "accounts")
-public class Account {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long accountId;
-    private Money balance;
-    private String secretKey;
-    @ManyToOne
-    @NotNull
-    @Valid
-    @JoinColumn(name = "account_holder")
-    private AccountHolder accountHolder;
-    @ManyToOne
-    @Valid
-    @JoinColumn(name = "secondary_account_holder")
-    private AccountHolder secondaryAccountHolder;
-    private LocalDateTime creationDate;
 
-    ThirdPartyTransaction class
- */
