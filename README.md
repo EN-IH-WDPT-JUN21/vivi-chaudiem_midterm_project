@@ -1,19 +1,4 @@
 # Midterm project: Banking system
-
-## Table of Contents
-
-1. [Introduction](#Introduction)
-2. [Functionality](#Functionality)
-    1. [SalesReps](#1-salesreps)
-    2. [Lead](#2-lead)
-    3. [Opportunity](#3-opportunity)
-    4. [Contact](#4-contact)
-    5. [Account](#5-account)
-    6. [Report](#6-report)
-3. [User Tutorial](#User-Tutorial)
-4. [Class Diagram](#Class-Diagram)
-5. [Use Case Diagram](#Use-Case-Diagram)
-### Introduction
 This is a banking system project which allows you to use the general basic functionalities of an online banking system.
 
 ### Getting started
