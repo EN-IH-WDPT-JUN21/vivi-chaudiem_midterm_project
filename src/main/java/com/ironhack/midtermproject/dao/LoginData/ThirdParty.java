@@ -20,4 +20,10 @@ public class ThirdParty extends User {
 
     private String name;
     private String hashedKey;
+
+    public ThirdParty(String username, String password, Role role, String name, String hashedKey) {
+        super(username, password, role);
+        this.name = name;
+        this.hashedKey = hashedKey;
+    }
 }
