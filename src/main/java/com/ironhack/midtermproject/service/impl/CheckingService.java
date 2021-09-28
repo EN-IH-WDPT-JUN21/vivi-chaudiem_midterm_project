@@ -1,13 +1,17 @@
 package com.ironhack.midtermproject.service.impl;
 
 import com.ironhack.midtermproject.dao.AccountData.Checking;
+import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
 import com.ironhack.midtermproject.enums.CheckingType;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
 import com.ironhack.midtermproject.repository.LoginDataRepositories.AccountHolderRepository;
 import com.ironhack.midtermproject.service.interfaces.ICheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
@@ -22,7 +26,13 @@ public class CheckingService implements ICheckingService {
     @Autowired
     private AccountHolderRepository accountHolderRepository;
 
+    @Transactional
     public Checking store(Checking checking) {
+        Long accountHolderId = checking.getAccountHolder().getId();
+        Optional<AccountHolder> accountHolder = accountHolderRepository.findById(accountHolderId);
+        if(accountHolder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder does not exist.");
+        }
         // Create a student checking account if the account holder is younger than 24
         int age = calculateAge(checking.getAccountHolder().getDateOfBirth(), LocalDate.now());
 
@@ -31,7 +41,7 @@ public class CheckingService implements ICheckingService {
             checking.setMinimumBalance(null);
             checking.setMonthlyMaintenanceFee(null);
         }
-//        accountHolderRepository.save(checking.getAccountHolder());
+        checking.setAccountHolder(accountHolder.get());
         return checkingRepository.save(checking);
     }
 

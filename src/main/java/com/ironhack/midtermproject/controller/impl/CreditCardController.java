@@ -39,7 +39,7 @@ public class CreditCardController implements ICreditCardController {
     @PostMapping("/create/creditcard")
     @ResponseStatus(HttpStatus.CREATED)
     public CreditCard store(@RequestBody @Valid CreditCard creditCard) {
-        return creditCardRepository.save(creditCard);
+        return creditCardService.store(creditCard);
     }
 
     @PatchMapping("/creditcard/interest/{id}")

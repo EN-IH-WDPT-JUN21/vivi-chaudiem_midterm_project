@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,7 +41,7 @@ public class SavingsController implements ISavingsController {
     @PostMapping("/create/savings")
     @ResponseStatus(HttpStatus.CREATED)
     public Savings store(@RequestBody @Valid Savings savings) {
-        return savingsRepository.save(savings);
+        return savingsService.store(savings);
     }
 
     @PatchMapping("/savings/interest/{id}")

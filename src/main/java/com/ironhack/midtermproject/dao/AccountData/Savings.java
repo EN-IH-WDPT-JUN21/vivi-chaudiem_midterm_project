@@ -34,7 +34,7 @@ public class Savings extends Account {
 //    private Long id;
 
 //    @OneToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL, optional = false)
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "account_holder_id")
     private AccountHolder accountHolder;
 

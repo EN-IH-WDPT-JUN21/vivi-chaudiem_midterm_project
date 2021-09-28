@@ -1,16 +1,21 @@
 package com.ironhack.midtermproject.service.impl;
 
 import com.ironhack.midtermproject.dao.AccountData.CreditCard;
+import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
 import com.ironhack.midtermproject.dao.Money;
 import com.ironhack.midtermproject.dao.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.enums.TransactionType;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.CreditCardRepository;
+import com.ironhack.midtermproject.repository.LoginDataRepositories.AccountHolderRepository;
 import com.ironhack.midtermproject.repository.TransactionRepository;
 import com.ironhack.midtermproject.service.interfaces.ICreditCardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,7 +31,23 @@ public class CreditCardService implements ICreditCardService {
     private CreditCardRepository creditCardRepository;
 
     @Autowired
+    private AccountHolderRepository accountHolderRepository;
+
+    @Autowired
     private TransactionRepository transactionRepository;
+
+
+    @Transactional
+    public CreditCard store(CreditCard creditCard) {
+        Long accountHolderId = creditCard.getAccountHolder().getId();
+        Optional<AccountHolder> accountHolder = accountHolderRepository.findById(accountHolderId);
+        if(accountHolder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder does not exist.");
+        }
+        creditCard.setAccountHolder(accountHolder.get());
+        return creditCardRepository.save(creditCard);
+    }
+
 
     public void addInterest(Long id) {
         Optional<CreditCard> optionalCreditCard = creditCardRepository.findById(id);
