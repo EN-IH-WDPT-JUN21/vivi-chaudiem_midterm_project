@@ -1,7 +1,7 @@
 # Midterm project: Banking system
 This is a banking system project which allows you to use the general basic functionalities of an online banking system.
 
-### Getting started
+## Getting started
 1. Clone this repo to a new project in IntelliJ
 2. Run the following code in your MySQL Workbench:
    ```sh
@@ -15,115 +15,122 @@ This is a banking system project which allows you to use the general basic funct
 3. Run the MidTermProjectApplication.
 4. Test the routes with Postman. All routes should start with **http://localhost:8080**
 
-### Functionality
+## Functionality
+### Admin account
+Some functionalities only for users having the role "Admin". A default admin user is created when running the application.
+The login data are<br>
+- username: admin
+- password: admin123
+
+Admins can create new accounts, access them and modify their balance.
+### Create an account
+There are three types of account that can be created: Savings, credit card and checking account.
+Moreover, admins can also integrate third-party accounts.
+
+#### Create an account holder
+Before being able to create any account, the account holder needs to be created in the system by the admin.<br>
+To do so, run the POST-route **/create/accountholder** with the following template in the body of the request:<br>
+```sh
+{
+"username": "<your input>",
+"password": "<your input>",
+"role": "ACCOUNT_HOLDER",
+"dateOfBirth": "<your input>",
+"primaryAddress": {
+    "streetAddress": "<your input>",
+    "city": "<your input>",
+    "postalCode": "<your input>"
+  },
+"mailingAddress": {
+    "streetAddress": "<your input>" (optional)
+    "city": "<your input>" (optional)
+    "postalCode": "<your input>" (optional)
+  }
+}
+```
 #### Create an account
-There are four types of account that can be created.
-To do so, run in Postman the following POST-route and include the input information in the body (for a template, see below):<br>
+After creating the respective account holder, an account can be created with the corresponding account holder id.
+This id is given when creating a new account holder.<br>
+To create a new account, run the following POST-route and include the input information in the body (for a template, see below):<br>
 - **/create/savings** to create a Savings account
 - **/create/creditcard** to create a Credit card account
-- **/create/checking** to create a Checking account
-- **/create/third-party** to create a third party account<br>
+- **/create/checking** to create a Checking account <br>
 If the primary owner is younger than 24, a Student Checking account will automatically created, which means that 
 the account does not have a monthly maintenance fee, nor a minimum balance.
 <br><br>
-
-##### Template to create a savings account (XXX are placeholders)
-{ <br>
-"balance": XXX, *(optional)*<br>
-"penaltyFee":  XXX, *(optional)*<br>
-"primaryOwner": { <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}, <br>
-"secondaryOwner": XXX, *(optional)*<br>
-"accountHolder": { <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"username": XXX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"password": XXX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"role": "ACCOUNT_HOLDER",<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"dateOfBirth": XXX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"primaryAddress": { <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;streetAddress: XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;city: XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;postalCode: XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>
-"mailingAddress": {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;streetAddress: XXX *(optional)*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;city: XXX *(optional)*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;postalCode: XXX *(optional)*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} <br>
-},<br>
-"secretKey": XXX,<br>
-"minimumBalance": XXX, *(optional)*<br>
-"interestRate": XXX *(optional)*<br>
-} <br>
-
-##### Template to create a creditcard account (XXX are placeholders)
-{ <br>
-"balance": XXX, *(optional)*<br>
-"penaltyFee":  XXX, *(optional)*<br>
-"primaryOwner": { <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}, <br>
-"secondaryOwner": XXX, *(optional)*<br>
-"accountHolder": { <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"username": XXX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"password": XXX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"role": "ACCOUNT_HOLDER",<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"dateOfBirth": XXX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"primaryAddress": { <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;streetAddress: XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;city: XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;postalCode: XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>
-"mailingAddress": {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;streetAddress: XXX *(optional)*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;city: XXX *(optional)*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;postalCode: XXX *(optional)*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} <br>
-},<br>
-"creditLimit": XXX *(optional)*, <br>
-"interestRate": XXX *(optional)*<br>
+One account holder can only own one account of each type (which means maximum 3 in total).
+#### Template to create a savings account
+```sh
+{
+"balance": <your input>, (optional)
+"penaltyFee":  <your input>, (optional)
+"primaryOwner": { 
+    "name": "<your input>" 
+    }, 
+"secondaryOwner"(optional): { 
+    "name": "<your input>" 
+    }, 
+"accountHolder": { 
+    "id": <the given id number>
+    },
+"secretKey": "<your input>",
+"minimumBalance": <your input>, (optional)
+"interestRate": <your input> (optional)
 }
-
-##### Template to create a checking account (XXX are placeholders)
-{ <br>
-"balance": XXX, *(optional)*<br>
-"penaltyFee":  XXX, *(optional)*<br>
-"primaryOwner": { <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}, <br>
-"secondaryOwner": XXX, *(optional)*<br>
-"accountHolder": { <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"username": XXX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"password": XXX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"role": "ACCOUNT_HOLDER",<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"dateOfBirth": XXX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"primaryAddress": { <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;streetAddress: XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;city: XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;postalCode: XXX <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>
-"mailingAddress": {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;streetAddress: XXX *(optional)*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;city: XXX *(optional)*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;postalCode: XXX *(optional)*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} <br>
-},<br>
-"minimumBalance": XXX *(optional)*, <br>
-"monthlyMaintenanceFee": XXX *(optional)* <br>
+```
+#### Template to create a credit card account 
+```sh
+{
+"balance": <your input>, (optional)
+"penaltyFee":  <your input>, (optional)
+"primaryOwner": { 
+    "name": "<your input>" 
+    }, 
+"secondaryOwner"(optional): { 
+    "name": "<your input>" 
+    }, 
+"accountHolder": { 
+    "id": <the given id number>
+    },
+"creditLimit": <your input>, (optional)
+"interestRate": <your input> (optional)
 }
+```
 
-##### Template to create a third-party account (XXX are placeholders)
-{ <br>
-"name": XXX,<br>
-"username": XXX,<br>
-"password": XXX,<br>
-"hashedKey": XXX,<br>
-"role": {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": "THIRD_PARTY"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+#### Template to create a checking account
+```sh
+{
+"balance": <your input>, (optional)
+"penaltyFee":  <your input>, (optional)
+"primaryOwner": { 
+    "name": "<your input>" 
+    }, 
+"secondaryOwner"(optional): { 
+    "name": "<your input>" 
+    }, 
+"accountHolder": { 
+    "id": <the given id number>
+    },
+"minimumBalance": <your input>, (optional)
+"monthlyMaintenanceFee": <your input> (optional)
 }
+```
+#### Third-party accounts
+Third-party accounts can be created by admins through the POST-route *"/create/third_party"*.<br>
+This is the template for the request body:
+```sh
+{ 
+"name": "<your input>",
+"username": "<your input>",
+"password": "<your input>",
+"hashedKey": "<your input>",
+"role": {
+    "name": "THIRD_PARTY"
+    }
+}
+```
 
-#### Get a list of accounts and transactions
+### Get a list of accounts and transactions
 In order to get a list of all the accounts and transactions (only available for admins),
 use the GET-route:<br>
 - /savings
@@ -132,7 +139,7 @@ use the GET-route:<br>
 - /third_party
 - /transactions
 
-#### Get information on specific accounts and transactions
+### Get information on specific accounts and transactions
 In order to get information on specific accounts and transactions,
 use the GET-route:<br>
 - /savings/{id}
@@ -140,25 +147,26 @@ use the GET-route:<br>
 - /checking/{id}
 - /third_party/{id}
 - /transactions/{id}
-#### Modify the balance of accounts
+### Modify the balance of accounts
 In order to modify the balance of specific accounts (only available for admins),
 use the PATCH-route:<br>
 - modify/savings/{id}
 - modify/creditcard/{id}
 - modify/checking/{id}
-#### Transfer money for account holders
+### Transfer money for account holders
 If an account holder wants to transfer money, (s)he must fill in the login data in the authorization fields
 and use the PATCH-route:<br>
 - /transfer/{accountType}/{value}/{owner}/{id}
-#### Transfer money for third parties
+### Transfer money for third parties
 If a third party account holder wants to transfer money, (s)he must fill in the login data in the authorization fields,
 add the hashed key in the header and use the PATCH-route:<br>
 - /transfer/third_party <br>
+
 with the parameter:<br>
 - values
 - id
 - secretKey *(of the account recipient, which is null when sending to another third party account)*
-#### Interest rate
+### Interest rate
 Interest rate will be added - if applicable - through the PATCH-route:<br>
 - /savings/interest/{id}
 - /creditcard/interest/{id}<br>
