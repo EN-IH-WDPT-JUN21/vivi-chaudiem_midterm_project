@@ -1,10 +1,9 @@
 package com.ironhack.midtermproject.dao.LoginData;
 
-import com.ironhack.midtermproject.dao.AccountData.Account;
 import com.ironhack.midtermproject.dao.AccountData.Checking;
 import com.ironhack.midtermproject.dao.AccountData.CreditCard;
 import com.ironhack.midtermproject.dao.AccountData.Savings;
-import com.ironhack.midtermproject.dao.Address;
+import com.ironhack.midtermproject.dao.utils.Address;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter

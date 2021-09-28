@@ -12,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -24,7 +25,7 @@ public class Checking extends Account {
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.MERGE, optional = false)
     @JoinColumn(name = "account_holder_id")
     private AccountHolder accountHolder;
 
@@ -42,5 +43,13 @@ public class Checking extends Account {
     // 12
     private BigDecimal monthlyMaintenanceFee = BigDecimal.valueOf(12);
 
-    // Check if AccountHolder is < 24 ? creation StudentCheckingAccount : normal Checking Account
+    public Checking(BigDecimal balance, Owner primaryOwner, Owner secondaryOwner, LocalDateTime creationDate, AccountHolder accountHolder, String secretKey, CheckingType checkingType, Status status, BigDecimal minimumBalance, BigDecimal monthlyMaintenanceFee) {
+        super(balance, primaryOwner, secondaryOwner, creationDate);
+        this.accountHolder = accountHolder;
+        this.secretKey = secretKey;
+        this.checkingType = checkingType;
+        this.status = status;
+        this.minimumBalance = minimumBalance;
+        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
+    }
 }

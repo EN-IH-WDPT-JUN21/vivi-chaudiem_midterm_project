@@ -4,8 +4,8 @@ import com.ironhack.midtermproject.dao.AccountData.*;
 import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
 import com.ironhack.midtermproject.dao.LoginData.ThirdParty;
 import com.ironhack.midtermproject.dao.LoginData.User;
-import com.ironhack.midtermproject.dao.Money;
-import com.ironhack.midtermproject.dao.Transaction;
+import com.ironhack.midtermproject.dao.utils.Money;
+import com.ironhack.midtermproject.dao.utils.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.enums.CheckingType;
 import com.ironhack.midtermproject.enums.Status;
@@ -26,12 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class TransactionService implements ITransactionService {

@@ -4,13 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ironhack.midtermproject.controller.dto.BalanceDTO;
+import com.ironhack.midtermproject.dao.AccountData.Checking;
 import com.ironhack.midtermproject.dao.AccountData.Owner;
-import com.ironhack.midtermproject.dao.AccountData.Savings;
-import com.ironhack.midtermproject.dao.utils.Address;
 import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
 import com.ironhack.midtermproject.dao.LoginData.Role;
+import com.ironhack.midtermproject.dao.utils.Address;
+import com.ironhack.midtermproject.enums.CheckingType;
 import com.ironhack.midtermproject.enums.Status;
-import com.ironhack.midtermproject.repository.AccountDataRepositories.SavingsRepository;
+import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
 import com.ironhack.midtermproject.repository.LoginDataRepositories.AccountHolderRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,31 +30,30 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
 
 @SpringBootTest
-class SavingsControllerTest {
+class CheckingControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private SavingsRepository savingsRepository;
+    private CheckingRepository checkingRepository;
 
     @Autowired
     private AccountHolderRepository accountHolderRepository;
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private List<Savings> savingsList;
+    private List<Checking> checkingList;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
         Role role = new Role("ACCOUNT_HOLDER");
         LocalDate dateOfBirth = LocalDate.parse("1995-01-01");
         Address primaryAddress = new Address("Street address", "12345", "Berlin");
@@ -73,39 +73,37 @@ class SavingsControllerTest {
         Owner primaryOwnerTwo = new Owner("John");
         LocalDateTime creationDate = LocalDateTime.of(2019, Month.MARCH, 28, 14, 33, 48);
 
-        savingsList = savingsRepository.saveAll(List.of(
-                new Savings(BigDecimal.valueOf(100), primaryOwnerOne, secondaryOwnerOne,
-                creationDate, accountHolderOne, "secretkey123", Status.ACTIVE,
-                BigDecimal.valueOf(1000), BigDecimal.valueOf(0.1)),
-                new Savings(BigDecimal.valueOf(200), primaryOwnerTwo, null,
-                        creationDate, accountHolderTwo, "secretkey123", Status.ACTIVE,
-                        BigDecimal.valueOf(1000), BigDecimal.valueOf(0.1))
+        checkingList = checkingRepository.saveAll(List.of(
+                new Checking(BigDecimal.valueOf(200), primaryOwnerOne, secondaryOwnerOne, creationDate, accountHolderOne, "123", CheckingType.STANDARD_CHECKING, Status.ACTIVE, BigDecimal.valueOf(250), BigDecimal.valueOf(12)),
+                new Checking(BigDecimal.valueOf(300), primaryOwnerTwo, null, creationDate, accountHolderTwo, "321", CheckingType.STUDENT_CHECKING, Status.ACTIVE, null, null)
+
         ));
     }
 
     @AfterEach
     void tearDown() {
-        savingsRepository.deleteAll();
+        checkingRepository.deleteAll();
         accountHolderRepository.deleteAll();
     }
 
     @Test
-    void findAll_listOfSavings() throws Exception {
-        MvcResult result = mockMvc.perform(get("/savings")).andExpect(status().isOk()).andReturn();
+    void findAll_listOfCheckingAccounts() throws Exception {
+        MvcResult result = mockMvc.perform(get("/checking")).andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("Jane"));
         assertTrue(result.getResponse().getContentAsString().contains("John"));
     }
 
+
     @Test
     void findByAccountId_correct() throws Exception {
-        Savings savings = savingsList.get(0);
-        long id = savings.getId();
-        MvcResult result = mockMvc.perform(get("/savings/" + id)).andExpect(status().isOk()).andReturn();
+        Checking checking = checkingList.get(0);
+        long id = checking.getId();
+        MvcResult result = mockMvc.perform(get("/checking/" + id)).andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("Jane"));
     }
 
     @Test
-    void store_newSavingsAccount() throws Exception {
+    void store_newCheckingAccount() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -119,57 +117,39 @@ class SavingsControllerTest {
         Owner primaryOwner3 = new Owner("Bob");
         LocalDateTime creationDate = LocalDateTime.of(2019, Month.MARCH, 28, 14, 33, 48);
 
-        Savings newSavingsAccount = new Savings(BigDecimal.valueOf(300), primaryOwner3, null,
-                creationDate, accountHolderTwo, "secretkey123", Status.ACTIVE,
-                BigDecimal.valueOf(1000), BigDecimal.valueOf(0.0025));
-
-        String body = objectMapper.writeValueAsString(newSavingsAccount);
-        MvcResult result = mockMvc.perform(post("/create/savings").content(body)
+        Checking newCheckingAccount = new Checking(BigDecimal.valueOf(300), primaryOwner3, null, creationDate, accountHolderTwo, "321", CheckingType.STUDENT_CHECKING, Status.ACTIVE, null, null);
+        String body = objectMapper.writeValueAsString(newCheckingAccount);
+        MvcResult result = mockMvc.perform(post("/create/checking").content(body)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("Bob"));
     }
 
 
     @Test
-    void addInterest_correct() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-        Savings savings = savingsList.get(0);
-        long id = savings.getId();
-        BigDecimal balance = savings.getBalance();
-        String body = objectMapper.writeValueAsString(savings);
-        mockMvc.perform(patch("/savings/interest/" + id).content(body)
-                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
-        assertEquals(savingsRepository.findById(id).get().getBalance(), balance.multiply(BigDecimal.valueOf(1.1)).setScale(2, RoundingMode.CEILING));
-    }
-
-    @Test
     void update_balance_correct() throws Exception {
         BalanceDTO balanceDTO = new BalanceDTO();
         balanceDTO.setBalance(BigDecimal.valueOf(500));
         String body = objectMapper.writeValueAsString(balanceDTO);
-        Savings savings = savingsList.get(0);
-        long id = savings.getId();
-        mockMvc.perform(patch("/modify/savings/" + id).content(body)
+        Checking checking = checkingList.get(0);
+        long id = checking.getId();
+        mockMvc.perform(patch("/modify/checking/" + id).content(body)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
-        assertEquals(savingsRepository.findById(id).get().getBalance(), BigDecimal.valueOf(500.00).setScale(2, RoundingMode.CEILING));
+        assertEquals(checkingRepository.findById(id).get().getBalance(), BigDecimal.valueOf(500.00).setScale(2, RoundingMode.CEILING));
     }
 
     @Test
-    void getSavingsByIdAndPrimaryOwner_correct() throws Exception {
-        Savings savings = savingsList.get(0);
-        long id = savings.getId();
-        MvcResult result = mockMvc.perform(get("/savings?id=" + id + "&primaryOwner=Jane")).andExpect(status().isOk()).andReturn();
+    void getCheckingByIdAndPrimaryOwner_correct() throws Exception {
+        Checking checking = checkingList.get(0);
+        long id = checking.getId();
+        MvcResult result = mockMvc.perform(get("/checking?id=" + id + "&primaryOwner=Jane")).andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("Jane"));
     }
 
     @Test
-    void getSavingsByIdAndSecondaryOwner_correct() throws Exception {
-        Savings savings = savingsList.get(0);
-        long id = savings.getId();
-        MvcResult result = mockMvc.perform(get("/savings?id=" + id + "&secondaryOwner=Jenny")).andExpect(status().isOk()).andReturn();
+    void getCheckingByIdAndSecondaryOwner_correct() throws Exception {
+        Checking checking = checkingList.get(0);
+        long id = checking.getId();
+        MvcResult result = mockMvc.perform(get("/checking?id=" + id + "&secondaryOwner=Jenny")).andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("Jenny"));
     }
 }

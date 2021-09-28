@@ -1,10 +1,9 @@
 package com.ironhack.midtermproject.service.impl;
 
-import com.ironhack.midtermproject.dao.AccountData.Account;
 import com.ironhack.midtermproject.dao.AccountData.Savings;
 import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
-import com.ironhack.midtermproject.dao.Money;
-import com.ironhack.midtermproject.dao.Transaction;
+import com.ironhack.midtermproject.dao.utils.Money;
+import com.ironhack.midtermproject.dao.utils.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.enums.TransactionType;
 import com.ironhack.midtermproject.repository.AccountDataRepositories.SavingsRepository;
@@ -18,9 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 

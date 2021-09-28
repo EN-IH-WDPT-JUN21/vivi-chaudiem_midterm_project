@@ -1,7 +1,6 @@
 package com.ironhack.midtermproject.controller.impl;
 
-import com.ironhack.midtermproject.dao.Money;
-import com.ironhack.midtermproject.dao.Transaction;
+import com.ironhack.midtermproject.dao.utils.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
 import com.ironhack.midtermproject.repository.TransactionRepository;
 import com.ironhack.midtermproject.service.interfaces.ITransactionService;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class TransactionController {

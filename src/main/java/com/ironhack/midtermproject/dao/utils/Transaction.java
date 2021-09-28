@@ -1,4 +1,4 @@
-package com.ironhack.midtermproject.dao;
+package com.ironhack.midtermproject.dao.utils;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ironhack.midtermproject.enums.AccountType;
@@ -7,11 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
