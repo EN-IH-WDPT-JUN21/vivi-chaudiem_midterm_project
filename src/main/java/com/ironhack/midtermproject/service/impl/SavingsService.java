@@ -53,7 +53,6 @@ public class SavingsService implements ISavingsService {
             BigDecimal interestValue = currentBalance.multiply(interest);
             BigDecimal newBalance = currentBalance.add(interestValue);
 
-
             savings.setBalance(newBalance);
             savingsRepository.save(savings);
 

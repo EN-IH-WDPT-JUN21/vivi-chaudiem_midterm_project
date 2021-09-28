@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CreditCard extends Account {
 
-    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.MERGE, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, optional = false)
     @JoinColumn(name = "account_holder_id")
     private AccountHolder accountHolder;
 
