@@ -45,6 +45,10 @@ public class SavingsService implements ISavingsService {
         if(accountHolder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder does not exist.");
         }
+        Optional<Savings> existentSavingsAccount = savingsRepository.findByAccountHolder(accountHolder.get());
+        if(!existentSavingsAccount.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder already has a savings account.");
+        }
         savings.setAccountHolder(accountHolder.get());
         return savingsRepository.save(savings);
     }

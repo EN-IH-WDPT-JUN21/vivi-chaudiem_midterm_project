@@ -44,6 +44,10 @@ public class CreditCardService implements ICreditCardService {
         if(accountHolder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder does not exist.");
         }
+        Optional<CreditCard> existentCreditCardAccount = creditCardRepository.findByAccountHolder(accountHolder.get());
+        if(!existentCreditCardAccount.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder already has a credit card account.");
+        }
         creditCard.setAccountHolder(accountHolder.get());
         return creditCardRepository.save(creditCard);
     }

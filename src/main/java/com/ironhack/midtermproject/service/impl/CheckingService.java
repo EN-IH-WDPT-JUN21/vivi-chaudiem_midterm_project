@@ -33,6 +33,12 @@ public class CheckingService implements ICheckingService {
         if(accountHolder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder does not exist.");
         }
+
+        Optional<Checking> existentCheckingAccount = checkingRepository.findByAccountHolder(accountHolder.get());
+        if(!existentCheckingAccount.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder already has a checking account.");
+        }
+
         // Create a student checking account if the account holder is younger than 24
         int age = calculateAge(checking.getAccountHolder().getDateOfBirth(), LocalDate.now());
 
