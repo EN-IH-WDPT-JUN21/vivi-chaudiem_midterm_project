@@ -21,10 +21,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Checking extends Account {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-
     @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.MERGE, optional = false)
     @JoinColumn(name = "account_holder_id")
     private AccountHolder accountHolder;

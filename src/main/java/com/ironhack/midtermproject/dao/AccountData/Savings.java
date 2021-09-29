@@ -26,14 +26,8 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@PrimaryKeyJoinColumn(name = "id")
 public class Savings extends Account {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-
-//    @OneToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL, optional = false)
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "account_holder_id")
     private AccountHolder accountHolder;
@@ -44,17 +38,11 @@ public class Savings extends Account {
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
-    // Can be instantiated with less, but not less than 100
     @DecimalMin(value = "100", message = "The minimum balance for instantiation is 100.")
     private BigDecimal minimumBalance = BigDecimal.valueOf(1000);
 
-    // Default 0,0025
-    // Max. 0,5
     @DecimalMax(value = "0.5", message = "The interest rate cannot be higher than 0.5")
     private BigDecimal interestRate = BigDecimal.valueOf(0.0025);
-
-    // How to add: per Year, check if exists 1 year or when it got interest the last time 1 year ago
-
 
     public Savings(BigDecimal balance, Owner primaryOwner, Owner secondaryOwner, LocalDateTime creationDate, AccountHolder accountHolder, String secretKey, Status status, BigDecimal minimumBalance, BigDecimal interestRate) {
         super(balance, primaryOwner, secondaryOwner, creationDate);

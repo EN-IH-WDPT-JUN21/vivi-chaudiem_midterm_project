@@ -205,6 +205,7 @@ public class TransactionService implements ITransactionService {
         fraudDetection(senderId, senderAccountType);
     }
 
+    // Check if the recipient account exists
     public boolean recipientExists(String ownerString, Long accountId) {
         Owner owner = new Owner(ownerString);
         boolean result = false;
@@ -219,14 +220,17 @@ public class TransactionService implements ITransactionService {
         return result;
     }
 
+    // Check if the account has enough money
     public boolean hasEnoughMoney(BigDecimal amount, BigDecimal currentBalance) {
         return amount.compareTo(currentBalance) > 0 ? false : true;
     }
 
+    // Check if the balance is below the minimum balance
     public boolean belowMinimumBalance(BigDecimal balance, BigDecimal minimumBalance) {
         return balance.compareTo(minimumBalance) > 0 ? false : true;
     }
 
+    // Method for the money transfer of third party accounts
     public void transferMoneyThirdParty(String hashedKey, String value, Long accountId, String secretKey) {
         // Transform input values
         Money valueAsMoney = new Money(BigDecimal.valueOf(Long.parseLong(value)));
@@ -300,6 +304,7 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    // Method to detect fraud
     public void fraudDetection(Long accountId, AccountType accountType) {
         // Fraud, if transactions made in 24 hours total to more than 150% of the customers highest daily total transactions in any other 24 hour period.
         boolean higherTransaction = false;
@@ -332,6 +337,7 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    // Check if there were more than two transactions per second
     public boolean hasMoreThanTwoTransactionsPerSecond(List<Transaction> transactionList) {
         for(Transaction transaction : transactionList) {
             LocalDateTime transactionDate = transaction.getTransactionDate();

@@ -40,9 +40,11 @@ public class CreditCardService implements ICreditCardService {
     public CreditCard store(CreditCard creditCard) {
         Long accountHolderId = creditCard.getAccountHolder().getId();
         Optional<AccountHolder> accountHolder = accountHolderRepository.findById(accountHolderId);
+        // Check if the account holder exists
         if(accountHolder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder does not exist.");
         }
+        // Check if the account holder already has a credit card account
         Optional<CreditCard> existentCreditCardAccount = creditCardRepository.findByAccountHolder(accountHolder.get());
         if(!existentCreditCardAccount.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder already has a credit card account.");
@@ -65,6 +67,7 @@ public class CreditCardService implements ICreditCardService {
         int timeDifference = calculateTimeDifference(creditCard.getCreationDate(), LocalDateTime.now());
         boolean hasNeverGottenAnyInterest = hasNeverGottenAnyInterest(id);
 
+        // If one of these two conditions applies, add interest
         if(interestAddedOneMonthOrLonger || (timeDifference > 30 && hasNeverGottenAnyInterest)) {
             BigDecimal currentBalance = creditCard.getBalance();
             BigDecimal interest = creditCard.getInterestRate();
@@ -82,6 +85,7 @@ public class CreditCardService implements ICreditCardService {
 
     }
 
+    // Check if it has been 1 month or longer since interest was added
     public boolean interestAddedOneMonthOrLonger(Long id) {
         List<Transaction> transactionList = transactionRepository.findByAccountOneIdAndAccountOneType(id, AccountType.CREDITCARD);
         for(Transaction transaction : transactionList) {
@@ -93,12 +97,14 @@ public class CreditCardService implements ICreditCardService {
         return false;
     }
 
+    // Check if the account has ever gotten any interest
     public boolean hasNeverGottenAnyInterest(Long id) {
         List<Transaction> transactionList = transactionRepository.findByAccountOneIdAndAccountOneType(id, AccountType.CREDITCARD);
         if(transactionList.isEmpty()) return true;
         return false;
     }
 
+    // Update the account's balance
     public void updateBalance(Long id, BigDecimal balance) {
         Optional<CreditCard> optionalCreditCard = creditCardRepository.findById(id);
         if(optionalCreditCard.isPresent()) {

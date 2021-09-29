@@ -57,7 +57,7 @@ class TransactionRepositoryTest {
         AccountType accountType = transaction1.getAccountOneType();
         long id = transaction1.getAccountOneId();
         List<Transaction> transactionTestList = transactionRepository.findByAccountOneIdAndAccountOneType(id, accountType);
-        assertTrue(transactionTestList.size() == 1);
+        assertTrue(transactionTestList.size() == 2);
     }
 
     @Test
@@ -65,7 +65,7 @@ class TransactionRepositoryTest {
         long id = transaction1.getAccountOneId();
         Optional<Double> optionalDouble = transactionRepository.findMaxAmount(String.valueOf(id));
         double resultAsDouble = optionalDouble.get();
-        assertEquals(transaction1.getValue().getAmount(), BigDecimal.valueOf(resultAsDouble).setScale(2, RoundingMode.CEILING));
+        assertEquals(BigDecimal.valueOf(300).setScale(2, RoundingMode.CEILING), BigDecimal.valueOf(resultAsDouble).setScale(2, RoundingMode.CEILING));
     }
 
     @Test

@@ -30,10 +30,11 @@ public class CheckingService implements ICheckingService {
     public Checking store(Checking checking) {
         Long accountHolderId = checking.getAccountHolder().getId();
         Optional<AccountHolder> accountHolder = accountHolderRepository.findById(accountHolderId);
+        // Check if the account holder exists
         if(accountHolder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder does not exist.");
         }
-
+        // Check if the account holder already has a checking account
         Optional<Checking> existentCheckingAccount = checkingRepository.findByAccountHolder(accountHolder.get());
         if(!existentCheckingAccount.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder already has a checking account.");
@@ -60,6 +61,7 @@ public class CheckingService implements ICheckingService {
         }
     }
 
+    // Method to update the account's balance
     public void updateBalance(Long id, BigDecimal balance) {
         Optional<Checking> optionalChecking = checkingRepository.findById(id);
         if(optionalChecking.isPresent()) {

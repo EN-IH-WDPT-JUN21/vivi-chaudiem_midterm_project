@@ -39,9 +39,11 @@ public class SavingsService implements ISavingsService {
     public Savings store(Savings savings) {
         Long accountHolderId = savings.getAccountHolder().getId();
         Optional<AccountHolder> accountHolder = accountHolderRepository.findById(accountHolderId);
+        // Check if the account holder exists
         if(accountHolder.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder does not exist.");
         }
+        // Check if the account holder already has a savings account
         Optional<Savings> existentSavingsAccount = savingsRepository.findByAccountHolder(accountHolder.get());
         if(!existentSavingsAccount.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The account holder already has a savings account.");
@@ -65,6 +67,7 @@ public class SavingsService implements ISavingsService {
         int timeDifference = calculateTimeDifference(savings.getCreationDate(), LocalDateTime.now());
         boolean hasNeverGottenAnyInterest = hasNeverGottenAnyInterest(id);
 
+        // If one of these two conditions applies, add interest
         if(interestAddedOneYearOrLonger || (timeDifference > 365 && hasNeverGottenAnyInterest)) {
             BigDecimal currentBalance = savings.getBalance();
             BigDecimal interest = savings.getInterestRate();
@@ -81,6 +84,7 @@ public class SavingsService implements ISavingsService {
 
     }
 
+    // Check if it has been 1 year or longer since interest was added
     public boolean interestAddedOneYearOrLonger(Long id) {
         List<Transaction> transactionList = transactionRepository.findByAccountOneIdAndAccountOneType(id, AccountType.SAVINGS);
         for(Transaction transaction : transactionList) {
@@ -92,6 +96,7 @@ public class SavingsService implements ISavingsService {
         return false;
     }
 
+    // Helper method to calculate the time difference
     public static int calculateTimeDifference(LocalDateTime date, LocalDateTime currentDate) {
         if(date != null && currentDate != null) {
             return (int) DAYS.between(date, currentDate);
@@ -100,12 +105,14 @@ public class SavingsService implements ISavingsService {
         }
     }
 
+    // Check if the account has every gotten any itnerest
     public boolean hasNeverGottenAnyInterest(Long id) {
         List<Transaction> transactionList = transactionRepository.findByAccountOneIdAndAccountOneType(id, AccountType.SAVINGS);
         if(transactionList.isEmpty()) return true;
         return false;
     }
 
+    // Method to update the account's balance
     public void updateBalance(Long id, BigDecimal balance) {
         Optional<Savings> optionalSavings = savingsRepository.findById(id);
         if(optionalSavings.isPresent()) {

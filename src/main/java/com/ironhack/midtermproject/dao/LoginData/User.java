@@ -31,9 +31,6 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-//    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    private Set<Role> roles;
-
     public void setPassword(String password) {
         this.password = encryptedPassword(password);
     }

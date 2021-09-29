@@ -27,7 +27,6 @@ public class Account {
 
     private BigDecimal balance = BigDecimal.valueOf(0);
     private final BigDecimal penaltyFee = BigDecimal.valueOf(40);
-    // Will be deducted automatically if balance < minimumBalance
 
     @AttributeOverrides({
             @AttributeOverride(name = "name", column = @Column(name = "primary_owner"))

@@ -18,7 +18,6 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // String or enum?
     private String name;
 
     @OneToOne(mappedBy = "role")
@@ -28,8 +27,4 @@ public class Role {
     public Role(String name) {
         this.name = name;
     }
-
-    //    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
 }

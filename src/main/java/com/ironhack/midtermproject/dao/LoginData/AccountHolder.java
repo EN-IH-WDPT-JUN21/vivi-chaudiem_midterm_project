@@ -21,9 +21,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @PrimaryKeyJoinColumn(name = "user_id")
 public class AccountHolder extends User {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
 
     @DateTimeFormat(pattern = "yyy-MM-dd")
     private LocalDate dateOfBirth;
