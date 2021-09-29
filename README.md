@@ -35,15 +35,15 @@ To do so, run the POST-route **/create/accountholder** with the following templa
 "username": "<your input>",
 "password": "<your input>",
 "role": "ACCOUNT_HOLDER",
-"dateOfBirth": "<your input>",
+"dateOfBirth": "YYYY-MM-DD",
 "primaryAddress": {
     "streetAddress": "<your input>",
     "city": "<your input>",
     "postalCode": "<your input>"
   },
 "mailingAddress": {
-    "streetAddress": "<your input>" (optional)
-    "city": "<your input>" (optional)
+    "streetAddress": "<your input>", (optional)
+    "city": "<your input>", (optional)
     "postalCode": "<your input>" (optional)
   }
 }
@@ -67,7 +67,7 @@ One account holder can only own one account of each type (which means maximum 3 
 "primaryOwner": { 
     "name": "<your input>" 
     }, 
-"secondaryOwner"(optional): { 
+"secondaryOwner": { (optional)
     "name": "<your input>" 
     }, 
 "accountHolder": { 
@@ -86,7 +86,7 @@ One account holder can only own one account of each type (which means maximum 3 
 "primaryOwner": { 
     "name": "<your input>" 
     }, 
-"secondaryOwner"(optional): { 
+"secondaryOwner": { (optional)
     "name": "<your input>" 
     }, 
 "accountHolder": { 
@@ -105,7 +105,7 @@ One account holder can only own one account of each type (which means maximum 3 
 "primaryOwner": { 
     "name": "<your input>" 
     }, 
-"secondaryOwner"(optional): { 
+"secondaryOwner": { (optional)
     "name": "<your input>" 
     }, 
 "accountHolder": { 
@@ -152,18 +152,24 @@ In order to modify the balance of specific accounts (only available for admins),
 use the PATCH-route:<br>
 - modify/savings/{id}
 - modify/creditcard/{id}
-- modify/checking/{id}
+- modify/checking/{id} <br>
+The body only needs to include the information 
+```sh
+{
+"balance": <your input>
+}
+```
 ### Transfer money for account holders
 If an account holder wants to transfer money, (s)he must fill in the login data in the authorization fields
 and use the PATCH-route:<br>
 - /transfer/{accountType}/{value}/{owner}/{id}
 ### Transfer money for third parties
 If a third party account holder wants to transfer money, (s)he must fill in the login data in the authorization fields,
-add the hashed key in the header and use the PATCH-route:<br>
+add the hashed key in the header (with "hashedKey") and use the PATCH-route:<br>
 - /transfer/third_party <br>
 
 with the parameter:<br>
-- values
+- value
 - id
 - secretKey *(of the account recipient, which is null when sending to another third party account)*
 ### Interest rate

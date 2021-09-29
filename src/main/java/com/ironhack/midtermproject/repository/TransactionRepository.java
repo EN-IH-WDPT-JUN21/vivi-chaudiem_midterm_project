@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -31,24 +32,25 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     Optional<Double> findMaxAmount(@Param("id") String accountId);
 
     @Query(
-            value = "SELECT sum(amount)" +
-                    "from transaction" +
-                    "where (account_one_id = :id OR account_two_id = :id) AND (transaction_date = CURDATE())",
+            value = "SELECT sum(amount)\n" +
+                    "from transaction\n" +
+                    "where (account_one_id = :id AND transaction_date = :transactiondate) OR (account_two_id = :id AND transaction_date = :transactiondate)",
             nativeQuery = true
     )
-    long findTotalToday(@Param("id") String accountId);
+    Optional<Double> findTotalToday(@Param("id") String accountId, @Param("transactiondate")LocalDateTime date);
 
     @Query(
-            value = "SELECT amount, transaction_date" +
-            "from transaction" +
-            "where (account_one_id = :id OR account_two_id = :id) AND transaction_date = CURDATE()",
+            value = "SELECT amount, transaction_date\n" +
+                    "from transaction\n" +
+                    "where (account_one_id = :id AND transaction_date = :transactiondate) OR (account_two_id = :id AND transaction_date = :transactiondate)",
+//                    "where (account_one_id = :id OR account_two_id = :id) AND (transaction_date = :transactiondate)",
             nativeQuery = true
     )
-    List<Transaction> findAllTransactionsFromId(@Param("id") String accountId);
+    List<Transaction> findAllTransactionsFromId(@Param("id") String accountId, @Param("transactiondate")LocalDateTime date);
 
     @Query(
-            value = "SELECT amount, transaction_date" +
-                    "from transaction" +
+            value = "SELECT amount, transaction_date\n" +
+                    "from transaction\n" +
                     "where transaction_date = :date",
             nativeQuery = true
     )

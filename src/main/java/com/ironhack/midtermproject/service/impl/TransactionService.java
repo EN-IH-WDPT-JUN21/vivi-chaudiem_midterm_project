@@ -127,11 +127,6 @@ public class TransactionService implements ITransactionService {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not enough money!");
                     }
                     break;
-                case "THIRD_PARTY":
-                    Optional<ThirdParty> optionalThirdParty = thirdPartyRepository.findById(optionalUser.get().getId());
-                    senderAccountType = AccountType.THIRD_PARTY;
-                    senderId = optionalThirdParty.get().getId();
-                    break;
             }
         }
 
@@ -195,6 +190,16 @@ public class TransactionService implements ITransactionService {
             transactionRepository.save(transaction);
             // Fraud detection
             fraudDetection(savingsOptionalRecipient.get().getId(), AccountType.SAVINGS);
+        }
+
+        // Case if it's a third-party account
+        else if(thirdPartyRepository.findById(accountId).isPresent()) {
+            ThirdParty thirdPartyOptionalRecipient = thirdPartyRepository.findById(accountId).get();
+            // Add the transaction
+            Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, senderAccountType, senderId,
+                    AccountType.THIRD_PARTY, thirdPartyOptionalRecipient.getId(), valueAsMoney, LocalDateTime.now());
+            transactionRepository.save(transaction);
+
         }
 
         fraudDetection(senderId, senderAccountType);
@@ -283,6 +288,16 @@ public class TransactionService implements ITransactionService {
                     AccountType.CREDITCARD, recipientSavings.getId(), valueAsMoney, LocalDateTime.now());
             transactionRepository.save(transaction);
         }
+
+        // Case if it's a third party account
+        if(thirdPartyRepository.findById(accountId).isPresent()) {
+            ThirdParty recipientThirdParty = thirdPartyRepository.findById(accountId).get();
+
+            // Add the transaction
+            Transaction transaction = new Transaction(TransactionType.MONEY_TRANSFER, AccountType.THIRD_PARTY, optionalThirdPartyUser.get().getId(),
+                    AccountType.THIRD_PARTY, recipientThirdParty.getId(), valueAsMoney, LocalDateTime.now());
+            transactionRepository.save(transaction);
+        }
     }
 
     public void fraudDetection(Long accountId, AccountType accountType) {
@@ -290,14 +305,16 @@ public class TransactionService implements ITransactionService {
         boolean higherTransaction = false;
         Optional<Double> highestDailyTotalOptional = transactionRepository.findMaxAmount(String.valueOf(accountId));
         if(highestDailyTotalOptional.isPresent()) {
+            double transactionsCurrentDay = 0;
             double highestDailyTotal = highestDailyTotalOptional.get();
-            double transactionsCurrentDay = transactionRepository.findTotalToday(String.valueOf(accountId));
+            Optional<Double> transactionsCurrentDayOptional = transactionRepository.findTotalToday(String.valueOf(accountId), LocalDateTime.now());
+            if(transactionsCurrentDayOptional.isPresent()) transactionsCurrentDay = transactionsCurrentDayOptional.get();
             double limit = highestDailyTotal*1.5;
             if(transactionsCurrentDay > limit) higherTransaction = true;
         }
 
         // Fraud, if more than 2 transactions occurring on a single account within a 1 second period.
-        List<Transaction> transactionList = transactionRepository.findAllTransactionsFromId(String.valueOf(accountId));
+        List<Transaction> transactionList = transactionRepository.findAllTransactionsFromId(String.valueOf(accountId), LocalDateTime.now());
         boolean hasMoreThanTwoTransactionsPerSecond = hasMoreThanTwoTransactionsPerSecond(transactionList);
 
         // Freeze account if any of these occurs
