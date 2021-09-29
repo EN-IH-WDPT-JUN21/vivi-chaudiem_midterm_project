@@ -17,14 +17,14 @@ This is a banking system project which allows you to use the general basic funct
 
 ## Functionality
 ### Admin account
-Some functionalities only for users having the role "Admin". A default admin user is created when running the application.
+Some functionalities only work for users having the role "Admin". A default admin user is created when running the application.
 The login data are<br>
 - username: admin
 - password: admin123
 
 Admins can create new accounts, access them and modify their balance.
 ### Create an account
-There are three types of account that can be created: Savings, credit card and checking account.
+There are three types of accounts that can be created: Savings, credit card and checking account.
 Moreover, admins can also integrate third-party accounts.
 
 #### Create an account holder
@@ -153,7 +153,8 @@ use the PATCH-route:<br>
 - modify/savings/{id}
 - modify/creditcard/{id}
 - modify/checking/{id} <br>
-The body only needs to include the information 
+
+The request body only needs to include the following information:
 ```sh
 {
 "balance": <your input>
@@ -163,15 +164,17 @@ The body only needs to include the information
 If an account holder wants to transfer money, (s)he must fill in the login data in the authorization fields
 and use the PATCH-route:<br>
 - /transfer/{accountType}/{value}/{owner}/{id}
+
+*Note: "accountType" means from which account you want to send money (savings, checking or creditcard).*
 ### Transfer money for third parties
 If a third party account holder wants to transfer money, (s)he must fill in the login data in the authorization fields,
-add the hashed key in the header (with "hashedKey") and use the PATCH-route:<br>
+add the hashed key in the header (with "hashedKey" as keyword) and use the PATCH-route:<br>
 - /transfer/third_party <br>
 
-with the parameter:<br>
+with the parameters:<br>
 - value
-- id
-- secretKey *(of the account recipient, which is null when sending to another third party account)*
+- id *(of the account recipient)*
+- secretKey *(of the account recipient, which is null when sending to another third party account. In this case, you can type in "null".)*
 ### Interest rate
 Interest rate will be added - if applicable - through the PATCH-route:<br>
 - /savings/interest/{id}
