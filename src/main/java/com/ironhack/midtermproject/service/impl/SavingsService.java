@@ -106,14 +106,6 @@ public class SavingsService implements ISavingsService {
         return false;
     }
 
-    public void update(Long id, Savings savings) {
-        Optional<Savings> optionalSavings = savingsRepository.findById(id);
-        if(optionalSavings.isPresent()) {
-            savings.setId(optionalSavings.get().getId());
-            savingsRepository.save(savings);
-        }
-    }
-
     public void updateBalance(Long id, BigDecimal balance) {
         Optional<Savings> optionalSavings = savingsRepository.findById(id);
         if(optionalSavings.isPresent()) {

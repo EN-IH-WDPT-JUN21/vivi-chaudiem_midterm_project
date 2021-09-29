@@ -9,9 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface AccountHolderRepository extends JpaRepository<AccountHolder, Long> {
-//    @Query(
-//            value = "SELECT "
-//    )
-//    Optional<AccountHolder> findByUserId(Long userId);
     Optional<AccountHolder> findById(Long id);
 }

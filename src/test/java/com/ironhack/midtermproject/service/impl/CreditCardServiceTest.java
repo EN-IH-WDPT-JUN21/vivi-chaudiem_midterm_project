@@ -1,17 +1,15 @@
-package com.ironhack.midtermproject.controller.impl;
+package com.ironhack.midtermproject.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ironhack.midtermproject.controller.dto.BalanceDTO;
-import com.ironhack.midtermproject.dao.AccountData.Checking;
+import com.ironhack.midtermproject.dao.AccountData.CreditCard;
 import com.ironhack.midtermproject.dao.AccountData.Owner;
 import com.ironhack.midtermproject.dao.LoginData.AccountHolder;
 import com.ironhack.midtermproject.dao.LoginData.Role;
 import com.ironhack.midtermproject.dao.utils.Address;
-import com.ironhack.midtermproject.enums.CheckingType;
-import com.ironhack.midtermproject.enums.Status;
-import com.ironhack.midtermproject.repository.AccountDataRepositories.CheckingRepository;
+import com.ironhack.midtermproject.repository.AccountDataRepositories.CreditCardRepository;
 import com.ironhack.midtermproject.repository.LoginDataRepositories.AccountHolderRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,24 +30,24 @@ import java.time.Month;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-
 
 @SpringBootTest
-class CheckingControllerTest {
+class CreditCardServiceTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private CheckingRepository checkingRepository;
+    private CreditCardRepository creditCardRepository;
 
     @Autowired
     private AccountHolderRepository accountHolderRepository;
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private List<Checking> checkingList;
+    private List<CreditCard> creditCardList;
 
     @BeforeEach
     void setUp() {
@@ -73,36 +71,22 @@ class CheckingControllerTest {
         Owner primaryOwnerTwo = new Owner("John");
         LocalDateTime creationDate = LocalDateTime.of(2019, Month.MARCH, 28, 14, 33, 48);
 
-        checkingList = checkingRepository.saveAll(List.of(
-                new Checking(BigDecimal.valueOf(200), primaryOwnerOne, secondaryOwnerOne, creationDate, accountHolderOne, "123", CheckingType.STANDARD_CHECKING, Status.ACTIVE, BigDecimal.valueOf(250), BigDecimal.valueOf(12)),
-                new Checking(BigDecimal.valueOf(300), primaryOwnerTwo, null, creationDate, accountHolderTwo, "321", CheckingType.STUDENT_CHECKING, Status.ACTIVE, null, null)
+        creditCardList = creditCardRepository.saveAll(List.of(
+                new CreditCard(BigDecimal.valueOf(100), primaryOwnerOne, secondaryOwnerOne, creationDate,
+                        accountHolderOne, BigDecimal.valueOf(100), BigDecimal.valueOf(0.2)),
+                new CreditCard(BigDecimal.valueOf(100), primaryOwnerTwo, null, creationDate,
+                        accountHolderTwo, BigDecimal.valueOf(100), BigDecimal.valueOf(0.2))
         ));
     }
 
     @AfterEach
     void tearDown() {
-        checkingRepository.deleteAll();
+        creditCardRepository.deleteAll();
         accountHolderRepository.deleteAll();
     }
 
     @Test
-    void findAll_listOfCheckingAccounts() throws Exception {
-        MvcResult result = mockMvc.perform(get("/checking")).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("Jane"));
-        assertTrue(result.getResponse().getContentAsString().contains("John"));
-    }
-
-
-    @Test
-    void findByAccountId_correct() throws Exception {
-        Checking checking = checkingList.get(0);
-        long id = checking.getId();
-        MvcResult result = mockMvc.perform(get("/checking/" + id)).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("Jane"));
-    }
-
-    @Test
-    void store_newCheckingAccount() throws Exception {
+    void store_newCreditCardAccount() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -116,39 +100,48 @@ class CheckingControllerTest {
         Owner primaryOwner3 = new Owner("Bob");
         LocalDateTime creationDate = LocalDateTime.of(2019, Month.MARCH, 28, 14, 33, 48);
 
-        Checking newCheckingAccount = new Checking(BigDecimal.valueOf(300), primaryOwner3, null, creationDate, accountHolderTwo, "321", CheckingType.STUDENT_CHECKING, Status.ACTIVE, null, null);
-        String body = objectMapper.writeValueAsString(newCheckingAccount);
-        MvcResult result = mockMvc.perform(post("/create/checking").content(body)
+        CreditCard newCreditCardAccount = new CreditCard(BigDecimal.valueOf(100), primaryOwner3, null, creationDate,
+                accountHolderTwo, BigDecimal.valueOf(100), BigDecimal.valueOf(0.2));
+
+        String body = objectMapper.writeValueAsString(newCreditCardAccount);
+        MvcResult result = mockMvc.perform(post("/create/creditcard").content(body)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("Bob"));
     }
 
+    @Test
+    void addInterest_correct() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+        CreditCard creditCard = creditCardList.get(0);
+        long id = creditCard.getId();
+        BigDecimal balance = creditCard.getBalance();
+        BigDecimal interestRate = creditCard.getInterestRate();
+        String body = objectMapper.writeValueAsString(creditCard);
+        mockMvc.perform(patch("/creditcard/interest/" + id).content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
+        assertEquals(creditCardRepository.findById(id).get().getBalance(), balance.multiply(BigDecimal.valueOf(1.1)).setScale(2, RoundingMode.CEILING));
+    }
+
+    @Test
+    void interestAddedOneMonthOrLonger() {
+    }
+
+    @Test
+    void hasNeverGottenAnyInterest() {
+    }
 
     @Test
     void update_balance_correct() throws Exception {
         BalanceDTO balanceDTO = new BalanceDTO();
         balanceDTO.setBalance(BigDecimal.valueOf(500));
         String body = objectMapper.writeValueAsString(balanceDTO);
-        Checking checking = checkingList.get(0);
-        long id = checking.getId();
-        mockMvc.perform(patch("/modify/checking/" + id).content(body)
+        CreditCard creditCard = creditCardList.get(0);
+        long id = creditCard.getId();
+        mockMvc.perform(patch("/modify/creditcard/" + id).content(body)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
-        assertEquals(checkingRepository.findById(id).get().getBalance(), BigDecimal.valueOf(500.00).setScale(2, RoundingMode.CEILING));
-    }
-
-    @Test
-    void getCheckingByIdAndPrimaryOwner_correct() throws Exception {
-        Checking checking = checkingList.get(0);
-        long id = checking.getId();
-        MvcResult result = mockMvc.perform(get("/checking?id=" + id + "&primaryOwner=Jane")).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("Jane"));
-    }
-
-    @Test
-    void getCheckingByIdAndSecondaryOwner_correct() throws Exception {
-        Checking checking = checkingList.get(0);
-        long id = checking.getId();
-        MvcResult result = mockMvc.perform(get("/checking?id=" + id + "&secondaryOwner=Jenny")).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("Jenny"));
+        assertEquals(creditCardRepository.findById(id).get().getBalance(), BigDecimal.valueOf(500.00).setScale(2, RoundingMode.CEILING));
     }
 }

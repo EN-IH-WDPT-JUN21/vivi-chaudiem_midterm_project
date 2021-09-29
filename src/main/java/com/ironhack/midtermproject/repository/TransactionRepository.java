@@ -43,7 +43,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             value = "SELECT amount, transaction_date\n" +
                     "from transaction\n" +
                     "where (account_one_id = :id AND transaction_date = :transactiondate) OR (account_two_id = :id AND transaction_date = :transactiondate)",
-//                    "where (account_one_id = :id OR account_two_id = :id) AND (transaction_date = :transactiondate)",
             nativeQuery = true
     )
     List<Transaction> findAllTransactionsFromId(@Param("id") String accountId, @Param("transactiondate")LocalDateTime date);

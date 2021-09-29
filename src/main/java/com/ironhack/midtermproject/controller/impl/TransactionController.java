@@ -51,26 +51,4 @@ public class TransactionController {
         transactionService.transferMoneyThirdParty(hashedKey, value, accountId, secretKey);
     }
 
-        /*
-        @GetMapping(value = "/savings", params = {"id", "primaryOwner"})
-    @ResponseStatus(HttpStatus.OK)
-    public Optional<Savings> getSavingsByIdAndPrimaryOwner(@RequestParam long id, @RequestParam String primaryOwner) {
-        Owner owner = new Owner(primaryOwner);
-        return savingsRepository.findByIdAndPrimaryOwner(id, owner);
-    }
-         */
-
-    /*
-    transferMoney(String hashedKey, String value, Long accountId, String secretKey) {
-
-     */
-
-//    @PutMapping("/transfer/{value}/{sender}/{senderId}/{recipient}/{recipientId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public void transferMoney(@PathVariable String value, @PathVariable(value = "sender") String senderAccountType, @PathVariable(value = "senderId") Long senderAccountId,
-//                              @PathVariable(value = "recipient") String recipientAccountType, @PathVariable(value = "recipientId") Long recipientAccountId) {
-//        transactionService.transferMoney(value, senderAccountType, senderAccountId, recipientAccountType, recipientAccountId);
-//    }
-
-
 }

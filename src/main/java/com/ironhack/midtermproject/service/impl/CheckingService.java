@@ -60,14 +60,6 @@ public class CheckingService implements ICheckingService {
         }
     }
 
-    public void update(Long id, Checking checking) {
-        Optional<Checking> optionalChecking = checkingRepository.findById(id);
-        if(optionalChecking.isPresent()) {
-            checking.setId(optionalChecking.get().getId());
-            checkingRepository.save(checking);
-        }
-    }
-
     public void updateBalance(Long id, BigDecimal balance) {
         Optional<Checking> optionalChecking = checkingRepository.findById(id);
         if(optionalChecking.isPresent()) {

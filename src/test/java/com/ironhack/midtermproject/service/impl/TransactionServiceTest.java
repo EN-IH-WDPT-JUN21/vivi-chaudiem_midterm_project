@@ -1,7 +1,6 @@
-package com.ironhack.midtermproject.controller.impl;
+package com.ironhack.midtermproject.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ironhack.midtermproject.dao.AccountData.Owner;
 import com.ironhack.midtermproject.dao.utils.Money;
 import com.ironhack.midtermproject.dao.utils.Transaction;
 import com.ironhack.midtermproject.enums.AccountType;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -22,11 +20,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @SpringBootTest
-class TransactionControllerTest {
+class TransactionServiceTest {
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -58,36 +55,31 @@ class TransactionControllerTest {
     }
 
     @Test
-    void findAll_listOfTransactions() throws Exception {
-        MvcResult result = mockMvc.perform(get("/transactions")).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains(String.valueOf(TransactionType.MONEY_TRANSFER)));
-        assertTrue(result.getResponse().getContentAsString().contains(String.valueOf(TransactionType.INTEREST)));
+    void transferMoney() {
     }
 
     @Test
-    void findByTransactionId_correct() throws Exception {
-        Transaction transaction = transactionList.get(0);
-        long id = transaction.getId();
-        MvcResult result = mockMvc.perform(get("/transactions/" + id)).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains(String.valueOf(TransactionType.MONEY_TRANSFER)));
+    void recipientExists_correct() {
+
     }
 
     @Test
-    void findByAccountOneId_correct() throws Exception {
-        Transaction transaction = transactionList.get(0);
-        long id = transaction.getAccountOneId();
-        String transactionType = transaction.getTransactionType().toString();
-        MvcResult result = mockMvc.perform(get("/transactions/savings/" + id)).andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains(transactionType));
+    void hasEnoughMoney() {
     }
 
     @Test
-    void transferMoney(){
-
+    void belowMinimumBalance() {
     }
-
 
     @Test
     void transferMoneyThirdParty() {
+    }
+
+    @Test
+    void fraudDetection() {
+    }
+
+    @Test
+    void hasMoreThanTwoTransactionsPerSecond() {
     }
 }

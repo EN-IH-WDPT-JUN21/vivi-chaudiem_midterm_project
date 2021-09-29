@@ -99,14 +99,6 @@ public class CreditCardService implements ICreditCardService {
         return false;
     }
 
-    public void update(Long id, CreditCard creditCard) {
-        Optional<CreditCard> optionalCreditCard = creditCardRepository.findById(id);
-        if(optionalCreditCard.isPresent()) {
-            creditCard.setId(optionalCreditCard.get().getId());
-            creditCardRepository.save(creditCard);
-        }
-    }
-
     public void updateBalance(Long id, BigDecimal balance) {
         Optional<CreditCard> optionalCreditCard = creditCardRepository.findById(id);
         if(optionalCreditCard.isPresent()) {

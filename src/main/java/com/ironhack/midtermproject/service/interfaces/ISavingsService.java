@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 
 public interface ISavingsService {
     void addInterest(Long id);
-    void update(Long id, Savings savings);
     void updateBalance(Long id, BigDecimal balance);
     Savings store(Savings savings);
 }
