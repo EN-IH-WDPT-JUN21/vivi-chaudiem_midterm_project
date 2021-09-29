@@ -180,6 +180,7 @@ Interest rate will be added - if applicable - through the PATCH-route:<br>
 - If an account drops below the minimumBalance, the penaltyFee will be deducted from the balance automatically.
 - The application recognizes patterns that indicate fraud and freezes the account status when potential fraud is detected.
 
-
+### Database diagram
+![Database diagram](src/main/java/com/ironhack/midtermproject/assets/Midtermproject_database_diagram.png)
 
 
